@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<%
+DIRECTIVE SAFE_OUTPUT_OPEN;
+%>
+<%
+    var odfBody = root;
+    var date = date();
+    var competition = odfBody.competition;
+    var medals = competition.medal;
+    var resultStatus = 'OFFICIAL';
+    if(medals.~size < 2){
+         resultStatus = 'PARTIAL';
+    }
+
+%>
+<OdfBody CompetitionCode="${odfBody.competitionCode}" DocumentCode="${odfBody.documentCode}"
+    DocumentType="${odfBody.documentType}" ResultStatus="${resultStatus!}"
+         Version="${odfBody.version}" FeedFlag="${odfBody.feedFlag}"
+    Date="${date,'yyyy-MM-dd'}" Time="${date,'HHmmssSSS'}" LogicalDate="${date,'yyyy-MM-dd'}" Source="${odfBody.source}">
+    <Competition Gen="${competition.gen}" Sport="${competition.sport}" Codes="${competition.codes}">
+        <% for( medal in medals ){
+            var competitor = medal.competitor;
+            var officials = competitor.officials;
+            var athletes = competitor.composition.athlete;
+        %>
+        <Medal Code="${medal.code}" Unit="${medal.unit}" Date="${medal.date}">
+            <Competitor Code="${competitor.code}" Type="T" Organisation="${competitor.organisation}" Order="${medalLP.index}">
+                <% if( competitor.description != null ){
+                    var description = competitor.description;
+                %>
+                <Description TeamName="${description.teamName}" />
+                <% } %>
+
+                <Composition>
+                    <% for( athlete in athletes ){
+                        var description = athlete.description;
+                    %>
+                    <Athlete Code="${athlete.code}" Order="${athlete.order}" Bib="${athlete.bib}">
+                        <% if( description != null ){ %>
+                        <Description GivenName="${description.givenName}" FamilyName="${description.familyName}" Gender="${description.gender}"
+                            Organisation="${description.organisation}" BirthDate="${description.birthDate}" IFId="" Class=""/>
+                        <% } %>
+                    </Athlete>
+                    <% } %>
+                </Composition>
+            </Competitor>
+        </Medal>
+        <% } %>
+    </Competition>
+</OdfBody>
+<%
+DIRECTIVE SAFE_OUTPUT_CLOSE;
+%>

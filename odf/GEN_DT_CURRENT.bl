@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<%
+DIRECTIVE SAFE_OUTPUT_OPEN;
+%>
+<%
+  var odfBody= root;
+  var date = date();
+  var clock = odfBody.competition.clock;
+  var periods = odfBody.competition.periods;
+ %>
+<OdfBody
+CompetitionCode="${odfBody.competitionCode!}"
+DocumentCode="${odfBody.documentCode!}"
+DocumentType="${odfBody.documentType!}"
+Version="${odfBody.version!}"
+Language="${odfBody.language!}"
+FeedFlag="${odfBody.feedFlag!}"
+Date="${date,'yyyy-MM-dd'}"
+Time="${date,'HHmmssSSS'}"
+LogicalDate="${date,'yyyy-MM-dd'}"
+Source="${odfBody.source!}">
+  <Competition>
+    <Clock Period="${clock.period!}" Time="${clock.time!}" Running="${clock.running!}"/>
+    <Periods Home="${periods.home!}" Away="${periods.away!}">
+        <% for(period in periods.period){ %>
+            <Period Code="${period.code!}" HomeScore="${period.homeScore!}" AwayScore="${period.awayScore!}" HomePeriodScore="${period.homePeriodScore!}" AwayPeriodScore="${period.awayPeriodScore!}"/>
+        <%}%>
+    </Periods>
+  </Competition>
+</OdfBody>
+
+<%
+DIRECTIVE SAFE_OUTPUT_CLOSE;
+%>

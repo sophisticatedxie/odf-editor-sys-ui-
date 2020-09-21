@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+
+<%
+DIRECTIVE SAFE_OUTPUT_OPEN;
+%>
+
+<%
+var odfBody = root;
+var date = date();
+var competition = odfBody.competition;
+var participants = competition.participant;
+%>
+<OdfBody CompetitionCode="${odfBody.competitionCode}"
+    DocumentCode="${odfBody.documentCode}"
+    DocumentType="${odfBody.documentType}"
+    Version="${odfBody.version}"
+    Language="${odfBody.language}"
+    FeedFlag="${odfBody.feedFlag}"
+    Date="${date,'yyyy-MM-dd'}"
+    Time="${date,'HHmmssSSS'}"
+    LogicalDate="${date,'yyyy-MM-dd'}"
+    Source="${odfBody.source}">
+    <Competition>
+        <% for(participant in participants) { 
+        var officialFunctions = participant.officialFunction;
+        var discipline = participant.discipline;
+        var disciplineEntrys = discipline.disciplineEntry;
+        var registeredEvents = discipline.registeredEvent;
+        %>
+        <Participant Code="${participant.code}"
+            Parent="${participant.code}"
+            Status="${participant.status}"
+            GivenName="${participant.givenName}"
+            FamilyName="${participant.familyName}"
+            PassportGivenName="${participant.givenName}"
+            PassportFamilyName="${participant.familyName}"
+            PrintName="${participant.printName}"
+            PrintInitialName="${participant.printInitialName}"
+            TVName="${participant.tVName}"
+            TVInitialName="${participant.tVInitialName}"
+            TVFamilyName="${participant.tVFamilyName}"
+            LocalFamilyName="${participant.familyName}"
+            LocalGivenName="${participant.givenName}"
+            Gender="${participant.gender}"
+            Organisation="${participant.organisation}"
+            <% if(participant.birthDate != null) { %>
+            BirthDate="${participant.birthDate}"
+            <% } %>
+            Height="${participant.height}"
+            Weight="${participant.weight}"
+            PlaceofBirth="${participant.placeofBirth}"
+            CountryofBirth="${participant.organisation}"
+            PlaceofResidence="${participant.placeofResidence}"
+            CountryofResidence="${participant.organisation}"
+            Nationality="${participant.organisation}"
+            MainFunctionId="${participant.mainFunctionId}"
+            Current="true"
+            ModificationIndicator="N">
+            <% for(officialFunction in officialFunctions) { %>
+            <OfficialFunction FunctionId="${officialFunction.functionId}" />
+            <% } %>
+
+            <Discipline Code="${discipline.code}" IFId="${discipline.iFId}">
+
+                <% for(disciplineEntry in disciplineEntrys) { %>
+                <DisciplineEntry Code="${disciplineEntry.code}" Type="${disciplineEntry.type}"
+                    Pos="${disciplineEntry.pos}" Value="${disciplineEntry.value}" />
+                <% } %>
+
+                <% for(registeredEvent in registeredEvents) {
+                    var eventEntrys = registeredEvent.eventEntry;
+                %>
+                <RegisteredEvent Event="${registeredEvent.event}" Bib="${registeredEvent.bib}"
+                    Class="${registeredEvent.class}" Substitute="${registeredEvent.substitute}"
+                    Status="${registeredEvent.status}">
+
+                    <% for(eventEntry in eventEntrys) { %>
+                    <EventEntry Code="${eventEntry.code}" Type="${eventEntry.type}" Pos="${eventEntry.pos}" Value="${eventEntry.value}"/>
+                    <% } %>
+
+                </RegisteredEvent>
+                <% } %>
+            </Discipline>
+        </Participant>
+        <% } %>
+    </Competition>
+</OdfBody>
+
+<%
+DIRECTIVE SAFE_OUTPUT_CLOSE;
+%>

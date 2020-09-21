@@ -1,0 +1,393 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"	elementFormDefault="qualified" attributeFormDefault="unqualified">
+
+	<!-- 
+							
+		R1 v1.00 2018-08-01 Aligned with version R-SOG-2020-GENV1.0 APP
+							
+							CR16078:	DT_PARTIC_NAME:  Scoreboard names  added
+							CR16537:	DT_PHASE_RESULT, DT_CUMULATIVE_RESULT,DT_BRACKET, DT_RANKING, DT_STATS, DT_POOL_STANDING: Added Progress element in ExtendedInfos
+							CR16541:	DT_NEWS, DT_BCK:  Changed Document/Title to free text 
+							CR16671:	DT_PARTIC, DT_PARTIC_NAME: Added TV family name 
+							CR16628:	DT_BRACKET: Added attributes to remove need for extensions and simplify processing.
+							Defect:		DT_COMMUNICATION: ExtendedComm cardinality changed
+		
+		R1 v1.01 2018-09-12 Aligned with version R-SOG-2020-GENV1.0 APP
+							Defect:		DT_SCHEDULE: Medal attribute to allow Bronze medal event unit (Value 3)
+		
+		R1 v1.01 2018-12-05 Aligned with version R-SOG-2020-GEN-V1.1 APP
+							CR16833: 	Update DT_SCHEDULE to clarify and allow UNSCHEDULED units in message Venue and Location become optional
+							CR16914:	Updates in DT_WEATHER to use venue level and adding extensions
+							CR16692: 	Add support for teams of teams in some messages.
+							CR16928: 	Add more addributes in results to remove some common extensions.
+							Defect: 	Startorder changed to string
+							Defect: 	ParticipantBiography /OfficialFunction@Main_Function_Flag changed to optional
+		R1 v1.02 2019-01-11 Aligned with version R-SOG-2020-GEN-V1.1 APP
+							CR16928: 	Some fixes in DT_RESULTS message
+		R1 v1.03 2019-01-22 Aligned with version R-SOG-2020-GEN-V1.1 APP
+							CR16928: 	Some fixes in DT_STATS message
+		R1 v1.04 2019-01-23 Aligned with version R-SOG-2020-GEN-V1.1 APP
+							CR16928: 	Some fixes in DT_STATS message
+		R1 v1.05 2019-02-05 Aligned with version R-SOG-2020-GEN-V1.1 APP
+							Defect:		DT_NEWS and DT_BCK; Parent attribute changed to String
+							Defect:		DT_SCHED_RES_NOC; Number of Result elements changed to 1:N
+		R1 v1.06 2019-04-11 Aligned with version R-SOG-2020-GEN-V1.2 APP
+							Defect:		Added "-" as a supported Gender
+							Defect:		Added "WATER" weather condition
+							CR016640:	Add ODF documentation version reference in messages
+							CR017269: 	Change athlete biographies to add field "Milestones"
+							CR016542: 	Add DT_FLAGBEARERS message
+							CR017409:	Common Codes: Add short NOC name
+							Defect:		DT_FLAGBEARERS Description  cardinality changed from 0:N to 1:1
+		R1 v1.07 2019-05-30 Aligned with version R-SOG-2020-GEN-V1.3 APP
+							Defect:		DT_FLAGBEARERS: Element "Ceremony" cardinality changed to 1:N
+							CR017521:	Teams of Teams; Multiple changes
+		R1 v1.08 2019-08-14 Aligned with version R-SOG-2020-GEN-V1.4 APP
+							CR017739:	ODF:GEN:DT_PARTIC_TEAM:Make NAME and TVNAME mandatory
+							CR017826: 	ODF:GEN:DT_SCHEDULE:Add medal flag in session for OBS
+							CR017808:	ODF:GEN:DT_STATS:Coaches and Referrees 
+							CR017827:   ODF:GEN:DT_RESULT:Cards to Officials	
+							CR018056:	ODF:GEN:Add standard named attributes in ResultItem	
+		R1 v1.09 2019-11-11 Aligned with version R-SOG-2020-GEN-V1.5 APP
+							Defect 		172722 -DT_BRACKET WLT attribute type changed to String to make it consistent across schema
+							CR018316: 	ODF:DT_PIC:modifications for Headshots
+		-->	
+	<xs:simpleType name="feedFlagType">
+		<xs:annotation>
+			<xs:documentation>Feed Flag type</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="P" />
+			<xs:enumeration value="T" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="rankEqualType">
+		<xs:annotation>
+			<xs:documentation>Rank Equal type</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Y" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="UncheckedType">
+		<xs:annotation>
+			<xs:documentation>Unchecked type</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Y" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="winnerLoserType">
+		<xs:annotation>
+			<xs:documentation>Winner Loser type</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="W" />
+			<xs:enumeration value="L" />
+			<xs:enumeration value="T" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="clockRunningType">
+		<xs:annotation>
+			<xs:documentation>Clock Running type</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Y" />
+			<xs:enumeration value="N" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="yesNoType">
+		<xs:annotation>
+			<xs:documentation>Clock Running type</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Y" />
+			<xs:enumeration value="N" />
+		</xs:restriction>
+	</xs:simpleType>
+	
+	<xs:simpleType name="brokenRecordEntryTypeType">
+		<xs:restriction base="xs:string">
+			<xs:length value="1" />
+			<xs:enumeration value="C" />
+			<xs:enumeration value="I" />
+		</xs:restriction>
+	</xs:simpleType>
+		
+	<xs:simpleType name="code1Type">
+		<xs:annotation>
+			<xs:documentation>One character code type</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:length value="1" />
+			<xs:pattern value="[A-Z0-9]{1}" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="code2Type">
+		<xs:annotation>
+			<xs:documentation>Two characters code type</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:length value="2" />
+			<xs:pattern value="[A-Z0-9]{2}" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="code3Type">
+		<xs:annotation>
+			<xs:documentation>Three characters code type</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:length value="3" />
+			<xs:pattern value="[A-Z0-9]{3}" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="rscType">
+		<xs:annotation>
+			<xs:documentation>RSC 34 characters fields</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:length value="11" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="odfDateType">
+		<xs:annotation>
+			<xs:documentation>YYYY-MM-DD</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[0-9]{4}[\-]{1}[0-9]{2}[\-]{1}[0-9]{2}" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="odfDateTimeType">
+		<xs:annotation>
+			<xs:documentation>YYYY-MM-DD HH:mm:ss</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[0-9]{4}[\-]{1}[0-9]{2}[\-]{1}[0-9]{2}[ ]{1}[0-9]{2}[:]{1}[0-9]{2}[:]{1}[0-9]{2}" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="odfTimeType">
+		<xs:annotation>
+			<xs:documentation>hhmmssfff</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[0-9]{9}" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="nameType">
+		<xs:annotation>
+			<xs:documentation>Type used for labels or names</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string" />
+	</xs:simpleType>
+	<xs:simpleType name="messageType">
+		<xs:annotation>
+			<xs:documentation>Type used for Note at the end of document</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string" />
+	</xs:simpleType>
+	<xs:simpleType name="genderCodeType">
+		<xs:annotation>
+			<xs:documentation>Gender code type.	M = Men W = Women	X = Mixed	O = Open</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:length value="1" />
+			<xs:pattern value="[MWXO]{1}" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="disciplinegenderCodeType">
+		<xs:annotation>
+			<xs:documentation>DisciplineGender code type.	M = Men, W = Women,	X = Mixed,	O = Open, - = Gobal</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:length value="1" />
+			<xs:pattern value="[MWXO]{1}" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="competitorTypeType">
+			<xs:annotation>
+			<xs:documentation>T = Team A = Athlete H = Horse</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:length value="1" />
+			<xs:enumeration value="T" />
+			<xs:enumeration value="A" />
+			<xs:enumeration value="H" />
+		</xs:restriction>
+	</xs:simpleType>
+		
+	<xs:simpleType name="weatherConditionsType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="SKY" />
+			<xs:enumeration value="SNOW" />
+			<xs:enumeration value="ICE" />
+			<xs:enumeration value="WATER" />
+		</xs:restriction>
+	</xs:simpleType>
+	
+	<xs:simpleType name="temperatureType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="AIR" />
+			<xs:enumeration value="SNOW" />
+			<xs:enumeration value="ICE" />
+			<xs:enumeration value="WAT" />
+			<xs:enumeration value="SAND" />
+		</xs:restriction>
+	</xs:simpleType>
+	
+	<xs:simpleType name="windType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="SPEED" />
+		</xs:restriction>
+	</xs:simpleType>
+	
+	<xs:simpleType name="resultStatusType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="START_LIST" />
+			<xs:enumeration value="OFFICIAL" />
+			<xs:enumeration value="UNOFFICIAL" />
+			<xs:enumeration value="INTERMEDIATE" />
+			<xs:enumeration value="PARTIAL" />
+			<xs:enumeration value="LIVE" />
+			<xs:enumeration value="UNCONFIRMED" />
+			<xs:enumeration value="PROTESTED" />
+		</xs:restriction>
+	</xs:simpleType>
+	
+	<xs:simpleType name="simpleMedalType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="ME_GOLD" />
+			<xs:enumeration value="ME_SILVER" />
+			<xs:enumeration value="ME_BRONZE" />
+		</xs:restriction>
+	</xs:simpleType>
+		
+	<xs:simpleType name="documentTypeType">
+		<xs:restriction base="xs:string">
+		
+			<!--SPORT MESSAGES  -->
+				<xs:enumeration value="DT_PDF" />
+				<xs:enumeration value="DT_RESULT" />
+				<xs:enumeration value="DT_RESULT_ANALYSIS" />
+				<xs:enumeration value="DT_CURRENT" />
+				<xs:enumeration value="DT_PHASE_RESULT" />
+				<xs:enumeration value="DT_CUMULATIVE_RESULT" />
+				<xs:enumeration value="DT_POOL_STANDING" />
+				<xs:enumeration value="DT_BRACKETS" />	
+				<xs:enumeration value="DT_PLAY_BY_PLAY" />
+				<xs:enumeration value="DT_STATS" />								
+				<xs:enumeration value="DT_RANKING" />
+				<xs:enumeration value="DT_MEDALLISTS" />
+				<xs:enumeration value="DT_MEDALLISTS_DISCIPLINE" />	
+				<xs:enumeration value="DT_PRESENTER" />						
+				<xs:enumeration value="DT_COMMUNICATION" />
+				<xs:enumeration value="DT_KA" />	
+				<xs:enumeration value="DT_LOCAL_ON" />
+				<xs:enumeration value="DT_LOCAL_OFF" />
+				<xs:enumeration value="DT_CONFIG" />
+
+				<xs:enumeration value="DT_IMAGE" />
+				<xs:enumeration value="DT_PRESSPHOTOFINISH_LK" />
+				<xs:enumeration value="DT_WEATHER" />	
+				<xs:enumeration value="DT_RECORD" />
+				
+
+				
+			<!--CENTRAL MESSAGES  -->
+				<xs:enumeration value="DT_SCHEDULE" />
+				<xs:enumeration value="DT_SCHEDULE_UPDATE" />
+				<xs:enumeration value="DT_PARTIC" />
+				<xs:enumeration value="DT_PARTIC_UPDATE" />
+				<xs:enumeration value="DT_PARTIC_TEAMS" />
+				<xs:enumeration value="DT_PARTIC_TEAMS_UPDATE" />
+				<xs:enumeration value="DT_PARTIC_HORSES" />
+				<xs:enumeration value="DT_PARTIC_HORSES_UPDATE" />		
+				<xs:enumeration value="DT_PARTIC_NAME" />
+				<xs:enumeration value="DT_GLOBAL_GM" />
+				<xs:enumeration value="DT_GLOBAL_GN" />
+				<xs:enumeration value="DT_NOTIFICATION" />
+				<xs:enumeration value="DT_PIC" />
+				<xs:enumeration value="DT_ESL" />
+				<xs:enumeration value="DT_SCHED_RES_NOC" />
+
+				<xs:enumeration value="DT_MEDALS" />
+				<xs:enumeration value="DT_MEDALLISTS_DAY" />
+				<xs:enumeration value="DT_BCK" />
+				<xs:enumeration value="DT_BCK_IMP" />
+				<xs:enumeration value="DT_TRS" />
+				<xs:enumeration value="DT_TRS_IMP" />
+				<xs:enumeration value="DT_ALERT" />
+				<xs:enumeration value="DT_NEWS" />
+				<xs:enumeration value="DT_NEWS_IMP" />
+				<xs:enumeration value="DT_BIO_PAR" />
+				<xs:enumeration value="DT_BIO_PAR_IMP" />
+				<xs:enumeration value="DT_BIO_TEA" />
+				<xs:enumeration value="DT_BIO_TEA_IMP" />
+				<xs:enumeration value="DT_BIO_NOC" />
+				<xs:enumeration value="DT_BIO_NOC_IMP" />
+				<xs:enumeration value="DT_BIO_HOR" />
+				<xs:enumeration value="DT_BIO_HOR_IMP" />
+				<xs:enumeration value="DT_IDK_COMMAND" />
+				<xs:enumeration value="DT_CODES" />
+				<xs:enumeration value="DT_WEA_ALERT" />
+				<xs:enumeration value="DT_VEN_COND" />
+				<xs:enumeration value="DT_TV_TRACKING" />
+				<xs:enumeration value="DT_FED_RANKING" />
+			    <xs:enumeration value="DT_FLAGBEARERS" />			
+			    <xs:enumeration value="DT_CEREMONY_ACTIVITY_LIST" />	
+				<xs:enumeration value="DT_CEREMONY_NOC_LIST" />	
+		</xs:restriction>
+	</xs:simpleType>
+	
+	<xs:simpleType name="unitMedalType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="0" />
+			<xs:enumeration value="1" />
+			<xs:enumeration value="2" />
+			<xs:enumeration value="3" />
+		</xs:restriction>
+	</xs:simpleType>
+	
+	<xs:simpleType name="scheduleStatusType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="CANCELLED" />
+			<xs:enumeration value="DELAYED" />
+			<xs:enumeration value="FINISHED" />
+			<xs:enumeration value="GETTING_READY" />
+			<xs:enumeration value="INTERRUPTED" />
+			<xs:enumeration value="POSTPONED" />
+			<xs:enumeration value="RESCHEDULED" />
+			<xs:enumeration value="RUNNING" />
+			<xs:enumeration value="SCHEDULED" />
+			<xs:enumeration value="SCHEDULED_BREAK" />
+			<xs:enumeration value="UNSCHEDULED" />
+		</xs:restriction>
+	</xs:simpleType>
+	
+	
+	<xs:simpleType name="modificationIndicatorType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="N" />
+			<xs:enumeration value="U" />
+			<xs:enumeration value="D" />
+			<xs:enumeration value="L" />
+			<xs:enumeration value="R" />
+		</xs:restriction>
+	</xs:simpleType>
+	
+	
+	<xs:simpleType name="bioHighlightsTypeType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="ATH" />
+			<xs:enumeration value="COA" />
+			<xs:enumeration value="OFF" />
+		</xs:restriction>
+	</xs:simpleType>
+	
+	<xs:simpleType name="entryStatusType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="CNF" />
+			<xs:enumeration value="ENT" />
+		</xs:restriction>
+	</xs:simpleType>
+	
+</xs:schema>

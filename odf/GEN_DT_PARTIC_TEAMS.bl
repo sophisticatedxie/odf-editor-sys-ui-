@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<%
+DIRECTIVE SAFE_OUTPUT_OPEN;
+%>
+
+<%
+var odfBody= root;
+var date = date();
+var competition = odfBody.competition;
+var teams = competition.team;
+%>
+
+<OdfBody
+        CompetitionCode="${odfBody.competitionCode}"
+        DocumentCode="${odfBody.documentCode}"
+        DocumentType="DT_PARTIC_TEAMS"
+        Version="${odfBody.version}"
+        Language="${odfBody.language}"
+        FeedFlag="P"
+        Date="${date,'yyyy-MM-dd'}"
+        Time="${date,'HHmmssSSS'}"
+        LogicalDate="${date,'yyyy-MM-dd'}"
+        Source="${odfBody.source}">
+    <Competition>
+        <% for(team in teams) {
+        var composition = team.composition;
+        var athletes = composition.athlete;
+        var teamOfficials = team.teamOfficials;
+        var officials = teamOfficials.official;
+        var discipline = team.discipline;
+        var events = discipline.registeredEvent;
+        %>
+        <Team Code="${team.code}"
+                Organisation="${team.organisation}"
+                Number="${team.number}"
+                Name="${team.name}"
+                TVTeamName="${team.tVTeamName}"
+                Gender="${team.gender}"
+                Current="true"
+                ModificationIndicator="N">
+            <Composition>
+                <% for(athlete in athletes) { %>
+                <Athlete Code="${athlete.code}" Order="${athlete.order}"/>
+                <% } %>
+            </Composition>
+            <% if(teamOfficials != null && teamOfficials != '') { %>
+            <TeamOfficials>
+                <%
+                 for(official in officials){
+                %>
+                <Official Code="${official.code}" Function="${official.function}" Order="${official.order}"/>
+                <% } %>
+            </TeamOfficials>
+            <% } %>
+            <Discipline Code="${discipline.code}" IFId="${discipline.iFId}">
+                <% for(event in events) {
+                var registeredEvent = event;
+                var eventEntrys = event.eventEntry;
+                %>
+                <RegisteredEvent Event="${registeredEvent.event}" Bib="${registeredEvent.bib}"
+                                 Substitute="${registeredEvent.substitute}" Status="${registeredEvent.status}">
+                    <% for(eventEntry in eventEntrys) {
+                    %>
+                    <EventEntry Code="${eventEntry.code}" Type="${eventEntry.type}" Pos="${eventEntry.pos}"
+                                Value="${eventEntry.value}"/>
+                    <% } %>
+                </RegisteredEvent>
+                <% } %>
+            </Discipline>
+        </Team>
+        <% } %>
+    </Competition>
+</OdfBody>
+
+
+<%
+DIRECTIVE SAFE_OUTPUT_CLOSE;
+%>

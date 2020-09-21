@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<%
+DIRECTIVE SAFE_OUTPUT_OPEN;
+%>
+<%
+  var odfBody= root;
+  var date = date();
+  var stats = odfBody.competition.stats;
+  var competitor = stats.competitor;
+  var statsItems = stats.statsItems;
+  var sportDescription = odfBody.competition.extendedInfos.sportDescription;
+ %>
+<OdfBody
+CompetitionCode="${odfBody.competitionCode}"
+DocumentCode="${odfBody.documentCode}"
+DocumentType="${odfBody.documentType}"
+Version="${odfBody.version}"
+Language="${odfBody.language}"
+FeedFlag="${odfBody.feedFlag}"
+Date="${date,'yyyy-MM-dd'}"
+Time="${date,'HHmmssSSS'}"
+LogicalDate="${date,'yyyy-MM-dd'}"
+Source="${odfBody.source}">
+  <Competition>
+    <ExtendedInfos>
+          <SportDescription DisciplineName="${sportDescription.disciplineName}" EventName="${sportDescription.eventName}" Gender="${sportDescription.gender}"/>
+    </ExtendedInfos>
+    <Stats Code="${stats.code}">
+	  <% for(com in competitor){ %>
+			<Competitor Code="${com.code}" Type="${com.type}" Order="${com.order}" Organisation="${com.organisation}">
+				<Description TeamName="${com.description.teamName}"/>
+				<StatsItems>
+					<% for(statsItem in com.statsItems.statsItem){ %>
+						<StatsItem Type="${statsItem.type}" Code="${statsItem.code}" Value="${statsItem.value}" Attempt="${statsItem.attempt}" Avg="${statsItem.avg}" >
+						</StatsItem>
+					<%}%>
+				</StatsItems>
+				<Composition>
+					<% for(athlete in com.composition.athlete){ %>
+						<Athlete Code="${athlete.code}" Order="${athlete.order}">
+                            <Description GivenName="${athlete.description.givenName}" FamilyName="${athlete.description.familyName}" Gender="${athlete.description.gender}" Organisation="${athlete.description.organisation}" BirthDate="${athlete.description.birthDate}"/>
+							<StatsItems>
+								<% for(statsItem in athlete.statsItems.statsItem){ %>
+									<StatsItem Type="${statsItem.type}" Code="${statsItem.code}" Value="${statsItem.value}" Attempt="${statsItem.attempt}" Avg="${statsItem.avg}" Rank="${statsItem.rank}" RankEqual="${statsItem.rankEqual}" SortOrder="${statsItem.sortOrder}">
+							  </StatsItem>
+								<%}%>
+							</StatsItems>
+						</Athlete>
+					<%}%>
+				</Composition>
+		  </Competitor>
+	  <%}%>
+    </Stats>
+  </Competition>
+</OdfBody>
+<%
+DIRECTIVE SAFE_OUTPUT_CLOSE;
+%>

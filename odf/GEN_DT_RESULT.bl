@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<%
+DIRECTIVE SAFE_OUTPUT_OPEN;
+%>
+<%
+var odfBody= root!;
+var date = date();
+var competition = odfBody.competition!;
+var extendedInfos = competition.extendedInfos!;
+var officials = competition.officials!;
+var periods = competition.periods!;
+var results = competition.result!;
+%>
+<OdfBody
+CompetitionCode="${odfBody.competitionCode!}"
+DocumentCode="${odfBody.documentCode!}"
+DocumentType="DT_RESULT"
+ResultStatus="${odfBody.resultStatus!}"
+Version="${odfBody.version!}"
+Language="${odfBody.language!}"
+FeedFlag="P"
+Date="${date,'yyyy-MM-dd'}"
+Time="${date,'HHmmssSSS'}"
+LogicalDate="${date,'yyyy-MM-dd'}"
+Source="${odfBody.source!}">
+  <Competition>
+    <%
+    var unitDateTime = extendedInfos.unitDateTime!;
+    var sportDescription = extendedInfos.sportDescription!;
+    var venueDescription = extendedInfos.venueDescription!;
+    %>
+    <ExtendedInfos>
+          <UnitDateTime StartDate="${unitDateTime.startDate!,dateFormat="yyyy-MM-dd'T'HH:mm:ss"}" />
+          <SportDescription DisciplineName="${sportDescription.disciplineName!}"
+            EventName="${sportDescription.eventName!}"
+            Gender="${sportDescription.gender!}"
+            SubEventName="${sportDescription.subEventName!}"
+            UnitNum="${sportDescription.unitNum!}"/>
+          <VenueDescription Venue="${venueDescription.venue!}"
+            VenueName="${venueDescription.venueName!}"
+            Location="${venueDescription.location!}"
+            LocationName="${venueDescription.locationName!}"
+            Attendance="${venueDescription.attendance!}"/>
+    </ExtendedInfos>
+
+    <% if(isNotEmpty(officials.official)) {  %>
+    <Officials>
+          <%  for (official in officials.official! ){  %>
+          <Official Code="${official.code!}" Function="${official.function!}" Order="${official.order!}" Bib="${official.bib!}">
+            <% var officialDescription = official.description!; %>
+            <Description GivenName="${officialDescription.givenName!}"
+                FamilyName="${officialDescription.familyName!}"
+                Gender="${officialDescription.gender!}"
+                Organisation="${officialDescription.organisation!}" />
+          </Official>
+          <%  }  %>
+     </Officials>
+      <% } %>
+
+      <% if(isNotEmpty(periods.period)) {  %>
+      <Periods Home="${periods.home!}" Away="${periods.away!}">
+      <% for (period in periods.period! ){  %>
+      <Period Code="${period.code!}"
+        HomeScore="${period.homeScore!}"
+        AwayScore="${period.awayScore!}"
+        HomePeriodScore="${period.homePeriodScore!}"
+        AwayPeriodScore="${period.awayPeriodScore!}">
+      </Period>
+      <% } %>
+    </Periods>
+      <% } %>
+      <% for (result in results!) { %>
+    <Result Result="${result.result!}" IRM="${result.irm!}"
+        WLT="${result.wlt!}" SortOrder="${result.sortOrder!}"
+        StartOrder="${result.startOrder!}" StartSortOrder="${result.startSortOrder!}"
+        ResultType="${result.resultType!}" >
+      <% var competitor = result.competitor!;
+         var description = competitor.description!;
+         var coaches = competitor.coaches!;
+         var eventUnitEntrys = competitor.eventUnitEntry!;
+         var statsItems = competitor.statsItems.statsItem!;
+         var athletes = competitor.composition.athlete!;
+       %>
+      <Competitor Code="${competitor.code!}" Type="T" Organisation="${competitor.organisation!}">
+        <Description TeamName="${description.teamName!}" />
+        <% if(isNotEmpty(coaches.coach)) {  %>
+        <Coaches>
+        <% for ( coach in coaches.coach!)  { %>
+        <Coach Code="${coach.code!}" Order="${coach.order!}" Function="${coach.function!}" Bib="${coach.bib!}">
+            <% var coachDescription = coach.description!;  %>
+            <Description GivenName="${coachDescription.givenName!}" FamilyName="${coachDescription.familyName!}"
+            Gender="${coachDescription.gender!}" Nationality="${coachDescription.nationality!}" />
+        </Coach>
+        <% } %>
+        </Coaches>
+        <% } %>
+        <% for ( eventUnitEntry in eventUnitEntrys!)  { %>
+        <EventUnitEntry Type="EUE" Code="${eventUnitEntry.code!}" Pos="${eventUnitEntry.pos!}" Value="${eventUnitEntry.value!}"/>
+        <% } %>
+        <StatsItems>
+          <% for ( statsItem in statsItems!)  { %>
+          <StatsItem Type="${statsItem.type!}" Code="${statsItem.code!}" Pos="${statsItem.pos!'TOT'}" Value="${statsItem.value!}" Attempt="${statsItem.attempt!}"/>
+          <% } %>
+        </StatsItems>
+        <Composition>
+          <% for ( athlete in athletes!)  { %>
+          <Athlete Code="${athlete.code!}" Order="${athlete.order!}" StartOrder="${athlete.startOrder!}" StartSortOrder="${athlete.startSortOrder!}" Bib="${athlete.bib!}">
+            <% var athleteDescription = athlete.description!;
+               var athleteEventUnitEntrys = athlete.eventUnitEntry!;
+               var athleteStatsItems = athlete.statsItems.statsItem!;
+            %>
+            <Description GivenName="${athleteDescription.givenName!}" FamilyName="${athleteDescription.familyName!}"
+                Gender="${athleteDescription.gender!}" Organisation="${athleteDescription.organisation!}" BirthDate="${athleteDescription.birthDate!}"/>
+            <% for ( athleteEventUnitEntry in athleteEventUnitEntrys!)  { %>
+            <EventUnitEntry Type="${athleteEventUnitEntry.type!}" Code="${athleteEventUnitEntry.code!}" Pos="${athleteEventUnitEntry.pos!}" Value="${athleteEventUnitEntry.value!}"/>
+            <% } %>
+            <% if(isNotEmpty(athleteStatsItems)){ %>
+                <StatsItems>
+              <% for ( athleteStatsItem in athleteStatsItems!)  { %>
+                  <StatsItem Type="${athleteStatsItem.type!}" Code="${athleteStatsItem.code!}" Pos="${athleteStatsItem.pos!'TOT'}"
+                  Value="${athleteStatsItem.value!}" Attempt="${athleteStatsItem.attempt!}"/>
+               <% } %>
+                </StatsItems>
+              <% } %>
+          </Athlete>
+          <% } %>
+        </Composition>
+      </Competitor>
+    </Result>
+    <% } %>
+  </Competition>
+</OdfBody>
+<%
+DIRECTIVE SAFE_OUTPUT_CLOSE;
+%>

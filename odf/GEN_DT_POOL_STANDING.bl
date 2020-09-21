@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<%
+DIRECTIVE SAFE_OUTPUT_OPEN;
+%>
+<%
+    var odfBody = root;
+    var date = date();
+    var competition = odfBody.competition;
+    var extendedInfo = competition.extendedInfos;
+    var competitionResults = competition.result;
+    var resultStatuss = odfBody.resultStatus;
+%>
+<OdfBody CompetitionCode="${odfBody.competitionCode}" DocumentCode="${odfBody.documentCode}"
+    DocumentType="${odfBody.documentType}" Version="${odfBody.version}"
+    ResultStatus="${odfBody.resultStatus!}" FeedFlag="${odfBody.feedFlag}"
+    Date="${date,'yyyy-MM-dd'}" Time="${date,'HHmmssSSS'}" LogicalDate="${date,'yyyy-MM-dd'}" Source="${odfBody.source}">
+    <Competition Gen="${competition.gen}" Sport="${competition.sport}" Codes="${competition.codes}">
+        <% if( extendedInfo != null ){
+            var progress = extendedInfo.progress;
+            var sportDescription = extendedInfo.sportDescription;
+         %>
+        <ExtendedInfos>
+            <% if( progress != null ){ %>
+            <Progress LastUnit="${progress.lastUnit}" UnitsTotal="${progress.unitsTotal}" UnitsComplete="${progress.unitsComplete}" />
+            <% } %>
+            <% if( sportDescription != null ){ %>
+            <SportDescription DisciplineName="${sportDescription.disciplineName}" EventName="${sportDescription.eventName}" SubEventName="${sportDescription.subEventName}" Gender="${sportDescription.gender}" />
+            <% } %>
+        </ExtendedInfos>
+        <% } %>
+        <% for( competitionResult in competitionResults ){
+            var competitor = competitionResult.competitor;
+            var  qualificationMark = '';
+            if(competitionResultLP.index<3 && resultStatuss == 'OFFICIAL'){
+                 qualificationMark = 'Q';
+            }
+        %>
+        <Result Rank="${competitionResult.sortOrder}"
+                    <% if( competitionResult.rankEqual == 'Y' ) {%> RankEqual="${competitionResult.rankEqual}" <% } %>
+                    ResultType="${competitionResult.resultType}"
+                    Result="${competitionResult.result}" IRM="${competitionResult.irm}" QualificationMark="${qualificationMark}" SortOrder="${competitionResult.sortOrder}"
+                    Won="${competitionResult.won}" Lost="${competitionResult.lost}" Tied="${competitionResult.tied}" Played="${competitionResult.played}"
+                    For="${competitionResult.ffor}" Against="${competitionResult.against}" Diff="${competitionResult.diff}">
+            <Competitor Code="${competitor.code}" Type="T" Organisation="${competitor.organisation}">
+                <% if( competitor != null ){
+                    if( competitor.description != null ){
+                        var description = competitor.description;
+                %>
+                <Description TeamName="${description.teamName}" />
+                <% } }%>
+                <%
+                    for( opponent in competitor.opponent ){
+                        var description = opponent.description;
+                        var opponentCode = opponent.code != "" && opponent.code != null ? opponent.code : "TBD";
+                        var HomeAway = opponent.homeAway ;
+                        if(HomeAway == 'HOME'){
+                HomeAway='AWAY';
+                       }else if(HomeAway == 'AWAY'){
+                HomeAway='HOME';
+                }
+                %>
+                <Opponent Type="T" Code="${opponentCode}" Pos="${opponent.pos}" Organisation="${opponent.organisation}" Date="${opponent.date}" Time="${opponent.time}" Unit="${opponent.unit}" HomeAway="${HomeAway}" Result="${opponent.result}">
+                    <% if( description != null ){ %>
+                    <Description TeamName="${description.teamName}"/>
+                    <% } %>
+                </Opponent>
+                <% } %>
+            </Competitor>
+        </Result>
+        <% } %>
+    </Competition>
+</OdfBody>
+<%
+DIRECTIVE SAFE_OUTPUT_CLOSE;
+%>

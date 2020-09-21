@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<%
+DIRECTIVE SAFE_OUTPUT_OPEN;
+%>
+<%
+  var odfBody= root;
+  var brackets = odfBody.competition.bracket;
+
+  var date = date();
+ %>
+<OdfBody
+CompetitionCode="${odfBody.competitionCode}"
+DocumentCode="${odfBody.documentCode}"
+DocumentSubcode="${odfBody.documentSubcode}"
+DocumentType="${odfBody.documentType}"
+Version="${odfBody.version}"
+Language="${odfBody.language}"
+FeedFlag="${odfBody.feedFlag}"
+Date="${date,'yyyy-MM-dd'}"
+Time="${date,'HHmmssSSS'}"
+LogicalDate="${date,'yyyy-MM-dd'}"
+Source="${odfBody.source}">
+  <Competition>
+   <% for(bracket in brackets){ %>
+    <Bracket Code="${bracket.code}">
+        <% for(items in bracket.bracketItems){ %>
+		${node}
+
+    	<%}%>
+    </Bracket>
+    <%}%>
+  </Competition>
+</OdfBody>
+<%
+DIRECTIVE SAFE_OUTPUT_CLOSE;
+%>

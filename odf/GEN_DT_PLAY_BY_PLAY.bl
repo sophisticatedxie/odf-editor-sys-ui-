@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<%
+DIRECTIVE SAFE_OUTPUT_OPEN;
+%>
+<%
+  var odfBody= root;
+  var sportDescription = odfBody.competition.extendedInfos.sportDescription;
+  var venueDescription = odfBody.competition.extendedInfos.venueDescription;
+  var actions = odfBody.competition.actions;
+  var action = actions.action;
+  var date = date();
+ %>
+<OdfBody
+CompetitionCode="${odfBody.competitionCode}"
+DocumentCode="${odfBody.documentCode}"
+DocumentSubcode="${odfBody.documentSubcode}"
+DocumentType="${odfBody.documentType}"
+DocumentSubtype="ACTION"
+Version="${odfBody.version}"
+Language="${odfBody.language}"
+FeedFlag="${odfBody.feedFlag}"
+Date="${date,'yyyy-MM-dd'}"
+Time="${date,'HHmmssSSS'}"
+LogicalDate="${date,'yyyy-MM-dd'}"
+Source="${odfBody.source}">
+    <Competition>
+        <ExtendedInfos>
+            <SportDescription DisciplineName="${sportDescription.disciplineName}" EventName="${sportDescription.eventName}" SubEventName="${sportDescription.subEventName}" Gender="${sportDescription.gender}"/>
+            <VenueDescription Venue="${venueDescription.venue}" VenueName="${venueDescription.venueName}" Location="${venueDescription.location}" LocationName="${venueDescription.locationName}"/>
+        </ExtendedInfos>
+        <Actions Home="${actions.home}" Away="${actions.away}">
+			<% for(ac in action){
+            if(ac.action == 'GA'){
+               continue;
+            }
+            var ScoreH = parseInt(ac.scoreH) + parseInt(ac.sOH) ;
+            var ScoreA = parseInt(ac.scoreA) + parseInt(ac.sOA) ;
+            var result = ac.result;
+            if(ac.action != 'PTY'){
+              result='';
+             }
+            %>
+			     <Action Id="${ac.id}" Result="${result}" PId="${ac.pid}" Period="${ac.period}" Order="${ac.order}" Action="${ac.action}" When="${ac.when}" ScoreH="${ScoreH}" ScoreA="${ScoreA}" LeadH="${ac.leadH}" LeadA="${ac.leadA}" SO_H="${ac.sOH}" SO_A="${ac.sOA}">
+                    <% for(com in ac.competitor){
+                    %>
+                        <Competitor Code="${com.code}" Type="${com.type}" Organisation="${com.organisation}">
+                            <Composition>
+                                <% for(ath in com.composition.athlete){
+                                  %>
+                                <Athlete Code="${ath.code}">
+                                    <Description GivenName="${ath.description.givenName}" FamilyName="${ath.description.familyName}" Gender="${ath.description.gender}" Organisation="${ath.description.organisation}" BirthDate="${ath.description.birthDate}"></Description>
+                                </Athlete>
+                                <%}%>
+                            </Composition>
+                        </Competitor>
+                    <%}%>
+                 </Action>
+			<%}%>
+
+		</Actions>
+    </Competition>
+</OdfBody>
+<%
+DIRECTIVE SAFE_OUTPUT_CLOSE;
+%>
