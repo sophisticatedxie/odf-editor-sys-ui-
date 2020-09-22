@@ -1,0 +1,51 @@
+# 因为我们Runner执行器设置为docker, 所以这里需要指定docker的版本
+image: docker:stable
+
+# 定义三个阶段
+stages:
+    - compile
+    - build
+    - deploy
+variables:
+    PROJECT_NAME: "odf-editor-sys-ui" 
+    IMAGE_NAME: "odf-editor-sys-ui-1.0"
+    CONTAINER_NAME: "odf-editor-sys-ui"
+compile:
+    image: docker.io/node 
+    stage: compile
+    script:
+        - npm install -g cnpm --registry=https://registry.npm.taobao.org
+        - cnpm install
+        - npm run build 
+    only:
+        - master
+    tags:
+        - my-tag
+    artifacts:
+        expire_in: 5 min
+        paths: 
+            - $PROJECT_NAME/dist/**
+
+#第二阶段， 打包docker 镜像
+build:
+    image: docker:stable
+    stage: build
+    only:
+        - master
+    tags:
+        - my-tag
+    script:
+        - docker build -t $IMAGE_NAME .
+
+#第三阶段,发布服务
+deploy:
+    image: docker:stable
+    stage: deploy
+    tags:
+        - my-tag
+    only:
+        - master
+    script:
+        - docker stop $CONTAINER_NAME ||true
+        - docker rm $CONTAINER_NAME || true
+        - docke run -d -p 8080:80 --name $CONTAINER_NAME  $IMAGE_NAME
