@@ -24,7 +24,7 @@ compile:
     artifacts:
         expire_in: 5 min
         paths: 
-            - $PROJECT_NAME/dist/**
+            - dist/**
 
 #第二阶段， 打包docker 镜像
 build:
