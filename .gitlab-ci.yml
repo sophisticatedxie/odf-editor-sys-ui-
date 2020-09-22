@@ -7,8 +7,8 @@ stages:
     - build
     - deploy
 variables:
-    PROJECT_NAME: "odf-editor-sys-ui" 
-    IMAGE_NAME: "odf-editor-sys-ui-1.0"
+    IMAGE_NAME: "odf-editor-sys-ui"
+    VERSION: "1.0.0"
     CONTAINER_NAME: "odf-editor-sys-ui"
 compile:
     image: docker.io/node 
@@ -35,7 +35,7 @@ build:
     tags:
         - my-tag
     script:
-        - docker build -t $IMAGE_NAME .
+        - docker build -t $IMAGE_NAME:$VERSION .
 
 #第三阶段,发布服务
 deploy:
@@ -48,4 +48,4 @@ deploy:
     script:
         - docker stop $CONTAINER_NAME ||true
         - docker rm $CONTAINER_NAME || true
-        - docke run -d -p 8080:80 --name $CONTAINER_NAME  $IMAGE_NAME
+        - docker run -d -p 8080:80 --name $CONTAINER_NAME  $IMAGE_NAME:$VERSION
