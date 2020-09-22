@@ -1,7 +1,7 @@
 <!--
  * @Author: xiejiarong
  * @Date: 2020-09-18 09:58:04
- * @LastEditTime: 2020-09-18 11:22:48
+ * @LastEditTime: 2020-09-22 17:00:03
  * @LastEditors: Please set LastEditors
  * @Description: 登录界面
  * @FilePath: \odf-editor-sys-ui\src\login\index.vue
@@ -20,8 +20,8 @@
         <div class="login-container">
             <form action="index.html">
                 <!--用户头像示例-->
-                <img class="avatar" src="static/img/avatar.svg" alt="avatar">
-                <h2>Welcome</h2>
+                <img class="avatar" src="static/img/logo.jpeg" alt="avatar">
+                <h3>odf模板平台</h3>
                 <!--用户名-->
                 <div class="input-div one">
                     <div class="i">
@@ -29,7 +29,7 @@
                         <i class="fa fa-user"></i>
                     </div>
                     <div>
-                        <h5>Username</h5>
+                        <h5>账号</h5>
                         <input type="text" class="input">
                     </div>
                 </div>
@@ -39,12 +39,12 @@
                         <i class="fa fa-lock"></i>
                     </div>
                     <div>
-                        <h5>Password</h5>
+                        <h5>密码</h5>
                         <input type="password" class="input">
                     </div>
                 </div>
                 <!--忘记密码-->
-                <a href="#">Forgot Password?</a>
+                <a href="#">忘记密码?</a>
                 <!--提交按钮-->
                 <input type="submit" class="btn" value="Login">
             </form>
