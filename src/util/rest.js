@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-07-27 11:16:24
- * @LastEditTime: 2020-09-17 11:33:05
+ * @LastEditTime: 2020-09-22 16:09:14
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \odf-editor-ui\src\util\rest.js
@@ -26,7 +26,7 @@ let rest = {
     });
     //请求前置拦截
     request.interceptors.request.use((config) => {
-      let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MDA3NTcwMzEsInVzZXJJZCI6InhpYW94aWUifQ.Ii2daStCjHhCbsmUiWwKGAed3D2RIN818PHge90kHMo";
+      let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MDIyMzMzNTgsInVzZXJJZCI6InhpYW94aWUifQ.kqvv92rO_1B_sUyCN7TKZlm7A47Z1RubR4Tfka-mvjc";
       config.headers['token'] = token;
       config.headers['operator'] = 'admin';
       return config;
