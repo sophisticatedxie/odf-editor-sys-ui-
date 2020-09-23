@@ -185,49 +185,60 @@
         <el-button @click="go">进 入</el-button>
         <el-button type="primary" @click="newTemplate">创建新模板</el-button>
       </div>
-       <el-dialog
-       append-to-body
-      width="30%"
-      title="新建模板"
-      :visible="$store.getters.GET_NEW_TEMPLATE_DIALOG_VISIBLE"
-      center
-      :before-close="newTemplateClose"
-    >
-    <el-form ref="newTem" :rules="newTemRules" :label-position="'left'" label-width="80px" :model="newTemObj">
-  <el-form-item label="模板名" prop="templateName">
-   <el-input
-   style="width:250px"
-  placeholder="请输入模板名"
-  v-model="newTemObj.templateName"
-  clearable>
-</el-input>
-  </el-form-item>
-  <el-form-item label="所属项目" prop="templateClassCode">
-   <el-select style="width:250px" v-model="newTemObj.templateClassCode" filterable placeholder="请选择">
-    <el-option
-      v-for="item in projects"
-      :key="item.id"
-      :label="item.name"
-      :value="item.id">
-    </el-option>
-  </el-select>
-  </el-form-item>
-  <el-form-item label="body" prop="bodyId">
-   <el-select style="width:250px" v-model="newTemObj.bodyId" filterable placeholder="请选择">
-    <el-option
-      v-for="item in bodys"
-      :key="item.bodyId"
-      :label="item.name"
-      :value="item.bodyId">
-    </el-option>
-  </el-select>
-  </el-form-item>
-</el-form>
-<div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="createTemplate">创建</el-button>
-        <el-button  @click="newTemplateClose">取消</el-button>
-      </div>
-    </el-dialog>
+      <el-dialog
+        append-to-body
+        width="30%"
+        title="新建模板"
+        :visible="$store.getters.GET_NEW_TEMPLATE_DIALOG_VISIBLE"
+        center
+        :before-close="newTemplateClose"
+      >
+        <el-form
+          ref="newTem"
+          :rules="newTemRules"
+          :label-position="'left'"
+          label-width="80px"
+          :model="newTemObj"
+        >
+          <el-form-item label="模板名" prop="templateName">
+            <el-input
+              style="width:250px"
+              placeholder="请输入模板名"
+              v-model="newTemObj.templateName"
+              clearable
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="所属项目" prop="templateClassCode">
+            <el-select
+              style="width:250px"
+              v-model="newTemObj.templateClassCode"
+              filterable
+              placeholder="请选择"
+            >
+              <el-option
+                v-for="item in projects"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id"
+              ></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="body" prop="bodyId">
+            <el-select style="width:250px" v-model="newTemObj.bodyId" filterable placeholder="请选择">
+              <el-option
+                v-for="item in bodys"
+                :key="item.bodyId"
+                :label="item.name"
+                :value="item.bodyId"
+              ></el-option>
+            </el-select>
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button type="primary" @click="createTemplate">创建</el-button>
+          <el-button @click="newTemplateClose">取消</el-button>
+        </div>
+      </el-dialog>
     </el-dialog>
     <setting-modal ref="settingModal"></setting-modal>
     <shortcut-modal ref="shortcutModal"></shortcut-modal>
@@ -355,21 +366,21 @@ export default {
   },
   data() {
     return {
-      newTemRules:{
-        templateName:[
-          {required: true, message:'模板名不得为空', trigger: 'blur'}
+      newTemRules: {
+        templateName: [
+          { required: true, message: "模板名不得为空", trigger: "blur" },
         ],
-        templateClassCode:[
-          {required: true, message:'请选择一个项目组', trigger: 'blur'}
+        templateClassCode: [
+          { required: true, message: "请选择一个项目组", trigger: "blur" },
         ],
-        bodyId:[
-          {required: true, message:'请选择一个body', trigger: 'blur'}
-        ]
+        bodyId: [
+          { required: true, message: "请选择一个body", trigger: "blur" },
+        ],
       },
-      newTemObj:{
-        templateName:'',
-        templateClassCode:'',
-        bodyId:''
+      newTemObj: {
+        templateName: "",
+        templateClassCode: "",
+        bodyId: "",
       },
       linkList: [],
       xmlResultDialog: false,
@@ -460,35 +471,37 @@ export default {
     genResult() {
       let that = this;
       let template = this.$store.getters.GET_CURRENT_TEMPLATE;
-        that.judgeTemplateModified((action,instance)=>{
-      if (action == "confirm") {
-              that.xmlDialog = false;
-              that.$nextTick(() => {
-                that.saveFlow(false).then((res) => {
-                  that.xmlDialog = false;
-                  that.$nextTick(() => {
-                    restful
-                      .genOdfResult(that, template.templateId)
-                      .then((resp) => {
-                        that.$set(template, "modified", false);
-                        that.$set(
-                          that.$store.getters.GET_CURRENT_TEMPLATE,
-                          "odfResult",
-                          resp
-                        );
-                        that.$nextTick(() => {
-                          that.xmlResultDialog = true;
-                        });
-                      })
-                      .catch((err) => {
-                        that.$set(template, "modified", true);
+      that.judgeTemplateModified(
+        (action, instance) => {
+          if (action == "confirm") {
+            that.xmlDialog = false;
+            that.$nextTick(() => {
+              that.saveFlow(false).then((res) => {
+                that.xmlDialog = false;
+                that.$nextTick(() => {
+                  restful
+                    .genOdfResult(that, template.templateId)
+                    .then((resp) => {
+                      that.$set(template, "modified", false);
+                      that.$set(
+                        that.$store.getters.GET_CURRENT_TEMPLATE,
+                        "odfResult",
+                        resp
+                      );
+                      that.$nextTick(() => {
+                        that.xmlResultDialog = true;
                       });
-                  });
+                    })
+                    .catch((err) => {
+                      that.$set(template, "modified", true);
+                    });
                 });
               });
-            }
-        },()=>{})
- 
+            });
+          }
+        },
+        () => {}
+      );
     },
     downLoadResult() {},
 
@@ -840,60 +853,59 @@ export default {
     loadFlow(json) {
       const that = this;
       that.clear();
-      that.$nextTick(()=>{
-let loadData = JSON.parse(json);
-      that.flowData.attr = loadData.attr;
-      that.flowData.config = loadData.config;
-      that.flowData.status = flowConfig.flowStatus.LOADING;
-      that.flowData.xmlJsonArray = loadData.xmlJsonArray;
-      that.plumb.batch(function () {
-        let nodeList = loadData.nodeList;
-        nodeList.forEach(function (node, index) {
-          that.flowData.nodeList.push(node);
-        });
-        let linkList = loadData.linkList;
-        that.$nextTick(() => {
-          linkList.forEach(function (link, index) {
-            that.flowData.linkList.push(link);
-            let conn = that.plumb.connect({
-              source: link.sourceId,
-              target: link.targetId,
-              anchor: flowConfig.jsPlumbConfig.anchor.default,
-              connector: [
-                link.cls.linkType,
-                {
-                  gap: 5,
-                  cornerRadius: 8,
-                  alwaysRespectStubs: true,
-                },
-              ],
-              paintStyle: {
-                stroke: link.cls.linkColor,
-                strokeWidth: link.cls.linkThickness,
-              },
-            });
-            if (link.label != "") {
-              conn.setLabel({
-                label: link.label,
-                cssClass: "linkLabel",
-              });
-            }
+      that.$nextTick(() => {
+        let loadData = JSON.parse(json);
+        that.flowData.attr = loadData.attr;
+        that.flowData.config = loadData.config;
+        that.flowData.status = flowConfig.flowStatus.LOADING;
+        that.flowData.xmlJsonArray = loadData.xmlJsonArray;
+        that.plumb.batch(function () {
+          let nodeList = loadData.nodeList;
+          nodeList.forEach(function (node, index) {
+            that.flowData.nodeList.push(node);
           });
-          that.currentSelect = {};
-          that.currentSelectGroup = [];
-          that.flowData.status = flowConfig.flowStatus.MODIFY;
+          let linkList = loadData.linkList;
           that.$nextTick(() => {
-            that.initFlag = true;
+            linkList.forEach(function (link, index) {
+              that.flowData.linkList.push(link);
+              let conn = that.plumb.connect({
+                source: link.sourceId,
+                target: link.targetId,
+                anchor: flowConfig.jsPlumbConfig.anchor.default,
+                connector: [
+                  link.cls.linkType,
+                  {
+                    gap: 5,
+                    cornerRadius: 8,
+                    alwaysRespectStubs: true,
+                  },
+                ],
+                paintStyle: {
+                  stroke: link.cls.linkColor,
+                  strokeWidth: link.cls.linkThickness,
+                },
+              });
+              if (link.label != "") {
+                conn.setLabel({
+                  label: link.label,
+                  cssClass: "linkLabel",
+                });
+              }
+            });
+            that.currentSelect = {};
+            that.currentSelectGroup = [];
+            that.flowData.status = flowConfig.flowStatus.MODIFY;
+            that.$nextTick(() => {
+              that.initFlag = true;
+            });
           });
-        });
-      }, true);
-      let canvasSize = that.computeCanvasSize();
-      that.$refs.flowArea.container.pos = {
-        top: -canvasSize.minY + 100,
-        left: -canvasSize.minX + 100,
-      };
-      })
-      
+        }, true);
+        let canvasSize = that.computeCanvasSize();
+        that.$refs.flowArea.container.pos = {
+          top: -canvasSize.minY + 100,
+          left: -canvasSize.minX + 100,
+        };
+      });
     },
     findNodeConfig(belongto, type, tagName, callback) {
       let node = null;
@@ -1002,8 +1014,8 @@ let loadData = JSON.parse(json);
         templateContentStr: d,
         restfulUrl: template.restfulUrl,
         odfXmlStr: template.odfXmlStr,
-        templateClassCode:template.templateClassCode,
-        bodyId:template.bodyId
+        templateClassCode: template.templateClassCode,
+        bodyId: template.bodyId,
       };
       return restful.saveTemplate(that, param);
     },
@@ -1106,7 +1118,7 @@ let loadData = JSON.parse(json);
       that.flowData.nodeList = [];
       that.flowData.linkList = [];
       that.flowData.remarks = [];
-      that.flowData.xmlJsonArray=[];
+      that.flowData.xmlJsonArray = [];
     },
     toggleShowGrid() {
       let flag = this.flowData.config.showGrid;
@@ -1305,88 +1317,87 @@ let loadData = JSON.parse(json);
      * @description: 点击创建模板
      * @author: xiejr
      */
-    newTemplate(){
-      let that=this;
+    newTemplate() {
+      let that = this;
       let template = this.$store.getters.GET_CURRENT_TEMPLATE;
-      that.judgeTemplateModified((action, instance) => {
-            if (action == "confirm") {
-                that.saveFlow().then((res) => {
-                  that.clear();
-                  that.$nextTick(()=>{
-                    this.$store.commit("SET_NEW_TEMPLATE_DIALOG_VISIBLE", true);
-                  })
-                });
-              
-            }else{
-                  that.$nextTick(()=>{
-                    this.$store.commit("SET_NEW_TEMPLATE_DIALOG_VISIBLE", true);
-                  })
-            }
-          },()=>{
- that.$nextTick(()=>{
-                    this.$store.commit("SET_NEW_TEMPLATE_DIALOG_VISIBLE", true);
-                  })
-          })
-       
-                 
-      
+      that.judgeTemplateModified(
+        (action, instance) => {
+          if (action == "confirm") {
+            that.saveFlow().then((res) => {
+              that.clear();
+              that.$nextTick(() => {
+                this.$store.commit("SET_NEW_TEMPLATE_DIALOG_VISIBLE", true);
+              });
+            });
+          } else {
+            that.$nextTick(() => {
+              this.$store.commit("SET_NEW_TEMPLATE_DIALOG_VISIBLE", true);
+            });
+          }
+        },
+        () => {
+          that.$nextTick(() => {
+            this.$store.commit("SET_NEW_TEMPLATE_DIALOG_VISIBLE", true);
+          });
+        }
+      );
     },
 
     /**
      * @description: 判断当前模板是否修改过
      * @author: xiejr
      */
-    judgeTemplateModified(callback,not){
-      let that=this;
- let template = this.$store.getters.GET_CURRENT_TEMPLATE;
+    judgeTemplateModified(callback, not) {
+      let that = this;
+      let template = this.$store.getters.GET_CURRENT_TEMPLATE;
       if (!that.isNullOrEmpty(template) && template.modified) {
-                that.$confirm("当前模板存在修改,是否先保存？", "温馨提示", {
+        that.$confirm("当前模板存在修改,是否先保存？", "温馨提示", {
           type: "info",
           showClose: true,
           center: true,
-          callback: callback
+          callback: callback,
         });
-    }else{
-      not();
-    }
+      } else {
+        not();
+      }
     },
 
     /**
      * @description: 创建模板对话框关闭事件
      * @author: xiejr
      */
-    newTemplateClose(){
+    newTemplateClose() {
       this.$store.commit("SET_NEW_TEMPLATE_DIALOG_VISIBLE", false);
     },
     /**
      * @description: 开始创建模板
      * @author: xiejr
      */
-    createTemplate(){
-      let that=this;
-      that.$refs['newTem'].validate((valid)=>{
-        if(valid){
-          let template={
-            templateId:ZFSN.getUUID(),
-            templateName:this.newTemObj.templateName,
+    createTemplate() {
+      let that = this;
+      that.$refs["newTem"].validate((valid) => {
+        if (valid) {
+          let template = {
+            templateId: ZFSN.getUUID(),
+            templateName: this.newTemObj.templateName,
             templateClassCode: that.newTemObj.templateClassCode,
-            templateContentStr:'',
-            restfulUrl:'',
-            odfXmlStr:'',
-            bodyId:that.newTemObj.bodyId,
-            modified:false,
+            templateContentStr: "",
+            restfulUrl: "",
+            odfXmlStr: "",
+            bodyId: that.newTemObj.bodyId,
+            modified: false,
           };
           that.clear();
-          that.$nextTick(()=>{
-            that.$store.commit('SET_CURRENT_TEMPLATE',template);
+          that.$nextTick(() => {
+            that.$store.commit("SET_CURRENT_TEMPLATE", template);
             that.handleDialogClose();
             that.newTemplateClose();
-          })
-        }else{
+          });
+        } else {
           return false;
         }
-      })
-    }
+      });
+    },
   },
   computed: {
     edited() {
@@ -1400,24 +1411,24 @@ let loadData = JSON.parse(json);
      * @description: 所有项目组
      * @author: xiejr
      */
-    projects(){
-      let templates=this.$store.getters.GET_TEMPLATES || [];
-      return templates.map(data=>{
+    projects() {
+      let templates = this.$store.getters.GET_TEMPLATES || [];
+      return templates.map((data) => {
         return {
-          id:data.id,
-          name:data.label
-        }
+          id: data.id,
+          name: data.label,
+        };
       });
     },
-    bodys(){
-      let bodys=this.$store.getters.GET_BODY || [];
-      return bodys.map(data=>{
+    bodys() {
+      let bodys = this.$store.getters.GET_BODY || [];
+      return bodys.map((data) => {
         return {
-          bodyId:data.id,
-          name:data.node.elementName
-        }
-      })
-    }
+          bodyId: data.id,
+          name: data.node.elementName,
+        };
+      });
+    },
   },
   created() {
     let g = this;
