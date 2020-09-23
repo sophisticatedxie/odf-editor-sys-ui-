@@ -12,6 +12,7 @@ export default {
     currentTemplate: {},
     templates: [],
     templatesDialogVisible: false,
+    newTemplateDialogVisble:false,
     odfBody: [],
 
   },
@@ -31,6 +32,9 @@ export default {
     },
     SET_BODY(state, body) {
       state.odfBody = body;
+    },
+    SET_NEW_TEMPLATE_DIALOG_VISIBLE(state,visible){
+      state.newTemplateDialogVisble=visible;
     }
 
   },
@@ -48,7 +52,8 @@ export default {
     GET_TEMPLATES: state => state.templates,
     GET_TEMPLATE_DISLOG_VISIBLE: state => state.templatesDialogVisible,
     GET_BODY: state => state.odfBody,
-    GET_NODES: state => state.nodes
+    GET_NODES: state => state.nodes,
+    GET_NEW_TEMPLATE_DIALOG_VISIBLE:state=>state.newTemplateDialogVisble
 
   }
 

@@ -1,7 +1,7 @@
 <!--
  * @Author:xiejr
  * @Date: 2020-07-24 11:52:25
- * @LastEditTime: 2020-09-16 18:31:14
+ * @LastEditTime: 2020-09-23 11:11:22
  * @LastEditors: Please set LastEditors
  * @Description: 编辑器主页
  * @FilePath: \odf-editor-ui\src\components\flow\designer\FlowDesigner.vue
@@ -183,8 +183,51 @@
 
       <div slot="footer" class="dialog-footer">
         <el-button @click="go">进 入</el-button>
-        <el-button type="primary" @click="templatesVisible = false">创建新模板</el-button>
+        <el-button type="primary" @click="newTemplate">创建新模板</el-button>
       </div>
+       <el-dialog
+       append-to-body
+      width="30%"
+      title="新建模板"
+      :visible="$store.getters.GET_NEW_TEMPLATE_DIALOG_VISIBLE"
+      center
+      :before-close="newTemplateClose"
+    >
+    <el-form ref="newTem" :rules="newTemRules" :label-position="'left'" label-width="80px" :model="newTemObj">
+  <el-form-item label="模板名" prop="templateName">
+   <el-input
+   style="width:250px"
+  placeholder="请输入模板名"
+  v-model="newTemObj.templateName"
+  clearable>
+</el-input>
+  </el-form-item>
+  <el-form-item label="所属项目" prop="templateClassCode">
+   <el-select style="width:250px" v-model="newTemObj.templateClassCode" filterable placeholder="请选择">
+    <el-option
+      v-for="item in projects"
+      :key="item.id"
+      :label="item.name"
+      :value="item.id">
+    </el-option>
+  </el-select>
+  </el-form-item>
+  <el-form-item label="body" prop="bodyId">
+   <el-select style="width:250px" v-model="newTemObj.bodyId" filterable placeholder="请选择">
+    <el-option
+      v-for="item in bodys"
+      :key="item.bodyId"
+      :label="item.name"
+      :value="item.bodyId">
+    </el-option>
+  </el-select>
+  </el-form-item>
+</el-form>
+<div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="createTemplate">创建</el-button>
+        <el-button  @click="newTemplateClose">取消</el-button>
+      </div>
+    </el-dialog>
     </el-dialog>
     <setting-modal ref="settingModal"></setting-modal>
     <shortcut-modal ref="shortcutModal"></shortcut-modal>
@@ -195,20 +238,6 @@
       @genResult="genResult"
       v-model="$store.getters.GET_CURRENT_TEMPLATE.odfXmlStr"
     ></xml-viewer>
-    <!-- <el-dialog destroy-on-close width="90%" title="xml视图" :visible.sync="xmlDialog" center>
-      
-      <template slot="footer">
-        <el-button @click="genResult">生成报文</el-button>
-        <el-button @click="downLoadResult">取消</el-button>
-      </template>
-    </el-dialog>-->
-    <!-- <el-dialog destroy-on-close width="90%" title="odf报文" :visible.sync="xmlResultDialog" center>
-      <xml-viewer :code="$store.getters.GET_CURRENT_TEMPLATE.odfResult"></xml-viewer>
-      <template slot="footer">
-        <el-button @click="genResult">下载</el-button>
-        <el-button @click="downLoadResult">取消</el-button>
-      </template>
-    </el-dialog>-->
   </div>
 </template>
 
@@ -326,6 +355,22 @@ export default {
   },
   data() {
     return {
+      newTemRules:{
+        templateName:[
+          {required: true, message:'模板名不得为空', trigger: 'blur'}
+        ],
+        templateClassCode:[
+          {required: true, message:'请选择一个项目组', trigger: 'blur'}
+        ],
+        bodyId:[
+          {required: true, message:'请选择一个body', trigger: 'blur'}
+        ]
+      },
+      newTemObj:{
+        templateName:'',
+        templateClassCode:'',
+        bodyId:''
+      },
       linkList: [],
       xmlResultDialog: false,
       initFlag: false,
@@ -408,16 +453,15 @@ export default {
     };
   },
   methods: {
+    /**
+     * @description: 在线获取xml结果
+     * @author: xiejr
+     */
     genResult() {
       let that = this;
       let template = this.$store.getters.GET_CURRENT_TEMPLATE;
-      if (template.modified) {
-        that.$confirm("当前模板存在修改,是否先保存？", "温馨提示", {
-          type: "info",
-          showClose: true,
-          center: true,
-          callback: (action, instance) => {
-            if (action == "confirm") {
+        that.judgeTemplateModified((action,instance)=>{
+      if (action == "confirm") {
               that.xmlDialog = false;
               that.$nextTick(() => {
                 that.saveFlow(false).then((res) => {
@@ -443,9 +487,8 @@ export default {
                 });
               });
             }
-          },
-        });
-      }
+        },()=>{})
+ 
     },
     downLoadResult() {},
 
@@ -797,7 +840,8 @@ export default {
     loadFlow(json) {
       const that = this;
       that.clear();
-      let loadData = JSON.parse(json);
+      that.$nextTick(()=>{
+let loadData = JSON.parse(json);
       that.flowData.attr = loadData.attr;
       that.flowData.config = loadData.config;
       that.flowData.status = flowConfig.flowStatus.LOADING;
@@ -848,6 +892,8 @@ export default {
         top: -canvasSize.minY + 100,
         left: -canvasSize.minX + 100,
       };
+      })
+      
     },
     findNodeConfig(belongto, type, tagName, callback) {
       let node = null;
@@ -956,6 +1002,8 @@ export default {
         templateContentStr: d,
         restfulUrl: template.restfulUrl,
         odfXmlStr: template.odfXmlStr,
+        templateClassCode:template.templateClassCode,
+        bodyId:template.bodyId
       };
       return restful.saveTemplate(that, param);
     },
@@ -1058,7 +1106,7 @@ export default {
       that.flowData.nodeList = [];
       that.flowData.linkList = [];
       that.flowData.remarks = [];
-      that.$set(this.$store.getters.GET_CURRENT_TEMPLATE, "xmlJsonArray", []);
+      that.flowData.xmlJsonArray=[];
     },
     toggleShowGrid() {
       let flag = this.flowData.config.showGrid;
@@ -1224,7 +1272,6 @@ export default {
         result = result.replace(reg, forVal + "\n" + replaceStr + "%>");
         result = result.replace(new RegExp(`</${v.id}>`), "<% } %>");
       });
-      console.log(formatXml(result));
       this.$set(
         this.$store.getters.GET_CURRENT_TEMPLATE,
         "odfXmlStr",
@@ -1254,6 +1301,92 @@ export default {
       }
       return contentStr;
     },
+    /**
+     * @description: 点击创建模板
+     * @author: xiejr
+     */
+    newTemplate(){
+      let that=this;
+      let template = this.$store.getters.GET_CURRENT_TEMPLATE;
+      that.judgeTemplateModified((action, instance) => {
+            if (action == "confirm") {
+                that.saveFlow().then((res) => {
+                  that.clear();
+                  that.$nextTick(()=>{
+                    this.$store.commit("SET_NEW_TEMPLATE_DIALOG_VISIBLE", true);
+                  })
+                });
+              
+            }else{
+                  that.$nextTick(()=>{
+                    this.$store.commit("SET_NEW_TEMPLATE_DIALOG_VISIBLE", true);
+                  })
+            }
+          },()=>{
+ that.$nextTick(()=>{
+                    this.$store.commit("SET_NEW_TEMPLATE_DIALOG_VISIBLE", true);
+                  })
+          })
+       
+                 
+      
+    },
+
+    /**
+     * @description: 判断当前模板是否修改过
+     * @author: xiejr
+     */
+    judgeTemplateModified(callback,not){
+      let that=this;
+ let template = this.$store.getters.GET_CURRENT_TEMPLATE;
+      if (!that.isNullOrEmpty(template) && template.modified) {
+                that.$confirm("当前模板存在修改,是否先保存？", "温馨提示", {
+          type: "info",
+          showClose: true,
+          center: true,
+          callback: callback
+        });
+    }else{
+      not();
+    }
+    },
+
+    /**
+     * @description: 创建模板对话框关闭事件
+     * @author: xiejr
+     */
+    newTemplateClose(){
+      this.$store.commit("SET_NEW_TEMPLATE_DIALOG_VISIBLE", false);
+    },
+    /**
+     * @description: 开始创建模板
+     * @author: xiejr
+     */
+    createTemplate(){
+      let that=this;
+      that.$refs['newTem'].validate((valid)=>{
+        if(valid){
+          let template={
+            templateId:ZFSN.getUUID(),
+            templateName:this.newTemObj.templateName,
+            templateClassCode: that.newTemObj.templateClassCode,
+            templateContentStr:'',
+            restfulUrl:'',
+            odfXmlStr:'',
+            bodyId:that.newTemObj.bodyId,
+            modified:false,
+          };
+          that.clear();
+          that.$nextTick(()=>{
+            that.$store.commit('SET_CURRENT_TEMPLATE',template);
+            that.handleDialogClose();
+            that.newTemplateClose();
+          })
+        }else{
+          return false;
+        }
+      })
+    }
   },
   computed: {
     edited() {
@@ -1263,6 +1396,28 @@ export default {
       delete template.modified;
       return this.isEmptyObject(template);
     },
+    /**
+     * @description: 所有项目组
+     * @author: xiejr
+     */
+    projects(){
+      let templates=this.$store.getters.GET_TEMPLATES || [];
+      return templates.map(data=>{
+        return {
+          id:data.id,
+          name:data.label
+        }
+      });
+    },
+    bodys(){
+      let bodys=this.$store.getters.GET_BODY || [];
+      return bodys.map(data=>{
+        return {
+          bodyId:data.id,
+          name:data.node.elementName
+        }
+      })
+    }
   },
   created() {
     let g = this;

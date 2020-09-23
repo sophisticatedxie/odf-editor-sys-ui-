@@ -1,7 +1,7 @@
 /*
  * @Author: xiejiarong
  * @Date: 2020-08-20 10:55:31
- * @LastEditTime: 2020-09-11 14:36:31
+ * @LastEditTime: 2020-09-23 10:18:26
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \editor-ui\odf-editor-ui\src\elementui\index.js
@@ -32,7 +32,10 @@ import {
   Loading,
   MessageBox,
   Message,
-  Notification
+  Notification,
+  Option,
+  Select,
+
 } from 'element-ui';
 // 引用
 import ElScrollbar from "element-ui/lib/scrollbar";
@@ -43,7 +46,8 @@ const element={
         Vue.use(Dialog);
 Vue.use(Input);
 
-
+Vue.use(Option)
+Vue.use(Select)
 
 Vue.use(Button);
 
