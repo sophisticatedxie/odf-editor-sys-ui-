@@ -36,7 +36,6 @@ build:
         - my-tag
     script:
         - docker build -t $IMAGE_NAME:$VERSION .
-        - docker rmi -f  `docker images | grep 'none' | awk '{print $3}'`
 
 #第三阶段,发布服务
 deploy:
