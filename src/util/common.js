@@ -148,6 +148,39 @@ function List() {
     return false;
   }
 }
+
+function getId() {
+  let idType = 'uuid';
+  if (typeof idType == 'string') {
+    if (idType == 'uuid') {
+      return this.getUUID();
+    } else if (idType == 'time_stamp') {
+      return this.getTimeStamp();
+    }
+  } else if (idType instanceof Array) {
+    if (idType[0] == 'time_stamp_and_sequence') {
+      return this.getSequence(idType[1]);
+    } else if (idType[0] == 'time_stamp_and_sequence') {
+      return this.getTimeStampAndSequence(idType[1]);
+    } else if (idType[0] == 'custom') {
+      return idType[1]();
+    }
+  }
+}
+
+function getUUID() {
+  let s = [];
+  let hexDigits = "0123456789abcdef";
+  for (let i = 0; i < 36; i++) {
+    s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
+  }
+  s[14] = "4";
+  s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1);
+  s[8] = s[13] = s[18] = s[23] = "-";
+
+  let uuid = s.join("");
+  return uuid.replace(/-/g, '');
+}
 let result = {
   install: function (Vue) {
     $.extend(Vue.prototype, {
@@ -161,6 +194,10 @@ let result = {
         }
       }
 
+    });
+    $.extend(Vue.prototype, {
+      getId,
+      getUUID
     });
     $.extend(Vue.prototype, {
       getsec: function (str) {

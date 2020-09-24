@@ -1,18 +1,23 @@
 <!--
  * @Author:xiejr
  * @Date: 2020-07-24 11:52:25
- * @LastEditTime: 2020-09-23 11:11:22
+ * @LastEditTime: 2020-09-24 17:34:54
  * @LastEditors: Please set LastEditors
  * @Description: 编辑器主页
  * @FilePath: \odf-editor-ui\src\components\flow\designer\FlowDesigner.vue
 --> 
 <template>
-  <div style="height: 100%;">
+  <div style="height: 100%">
     <a-layout class="container">
-      <el-scrollbar style=" background: white;">
+      <el-scrollbar style="background: white">
         <a-layout-sider width="300" theme="light" class="select-area">
           <a-row>
-            <a-checkable-tag v-model="tag.checked0" @change="toggleNodeShow0" class="tag">工具</a-checkable-tag>
+            <a-checkable-tag
+              v-model="tag.checked0"
+              @change="toggleNodeShow0"
+              class="tag"
+              >工具</a-checkable-tag
+            >
             <div align="center">
               <a-list :grid="{ gutter: 8, column: 1 }" v-if="tag.toolShow">
                 <a-list-item>
@@ -21,7 +26,9 @@
                       v-for="(tool, index) in field.tools"
                       :key="index"
                       :icon="tool.icon"
-                      :type="currentTool.type == tool.type ? 'primary': 'default'"
+                      :type="
+                        currentTool.type == tool.type ? 'primary' : 'default'
+                      "
                       @click="selectTool(tool.type)"
                     ></a-button>
                   </a-button-group>
@@ -31,10 +38,18 @@
           </a-row>
 
           <a-row>
-            <a-checkable-tag v-model="tag.checked2" @change="toggleNodeShow2" class="tag">节点</a-checkable-tag>
+            <a-checkable-tag
+              v-model="tag.checked2"
+              @change="toggleNodeShow2"
+              class="tag"
+              >节点</a-checkable-tag
+            >
             <div align="center">
               <a-list :grid="{ gutter: 8, column: 2 }" v-if="tag.highNodeShow">
-                <a-list-item v-for="(node, index) in field.highNodes" :key="index">
+                <a-list-item
+                  v-for="(node, index) in field.highNodes"
+                  :key="index"
+                >
                   <div
                     class="node-item"
                     :type="node.type"
@@ -78,7 +93,12 @@
             @confirm="clear"
           >
             <a-tooltip title="重新绘制" placement="bottom">
-              <a-button :disabled="edited" class="header-option-button" size="small" icon="delete"></a-button>
+              <a-button
+                :disabled="edited"
+                class="header-option-button"
+                size="small"
+                icon="delete"
+              ></a-button>
             </a-tooltip>
           </a-popconfirm>
           <a-tooltip :title="flowData.config.showGridText" placement="bottom">
@@ -90,7 +110,12 @@
             ></a-button>
           </a-tooltip>
           <a-tooltip title="设置" placement="bottom">
-            <a-button @click="setting" class="header-option-button" size="small" icon="setting"></a-button>
+            <a-button
+              @click="setting"
+              class="header-option-button"
+              size="small"
+              icon="setting"
+            ></a-button>
           </a-tooltip>
           <a-popconfirm
             title="请选择帮助项："
@@ -103,11 +128,23 @@
           >
             <a-icon slot="icon" type="question-circle-o" style="color: red" />
             <a-tooltip title="帮助" placement="bottom">
-              <a-button class="header-option-button" size="small" icon="book"></a-button>
+              <a-button
+                class="header-option-button"
+                size="small"
+                icon="book"
+              ></a-button>
             </a-tooltip>
           </a-popconfirm>
-          <a-button type="primary" size="small" @click="selectOtherTemplates">选择模板</a-button>
-          <a-button type="primary" :disabled="edited" size="small" @click="showXml">xml视图</a-button>
+          <a-button type="primary" size="small" @click="selectOtherTemplates"
+            >选择模板</a-button
+          >
+          <a-button
+            type="primary"
+            :disabled="edited"
+            size="small"
+            @click="showXml"
+            >xml视图</a-button
+          >
         </a-layout-header>
         <a-layout-content class="content" ref="canvas">
           <flow-area
@@ -123,15 +160,29 @@
             @getShortcut="getShortcut"
             @saveFlow="saveFlow"
           ></flow-area>
-          <vue-context-menu :contextMenuData="linkContextMenuData" @deleteLink="deleteLink"></vue-context-menu>
+          <vue-context-menu
+            :contextMenuData="linkContextMenuData"
+            @deleteLink="deleteLink"
+          ></vue-context-menu>
         </a-layout-content>
         <a-layout-footer class="foot">
-          <span>odf-editor {{ info.version }}, Powered by {{ info.author }}</span>
+          <span
+            >odf-editor {{ info.version }}, Powered by {{ info.author }}</span
+          >
         </a-layout-footer>
       </a-layout>
-      <el-scrollbar style=" background: white;">
-        <a-layout-sider width="380" theme="light" class="attr-area" @mousedown.stop="loseShortcut">
-          <flow-attr :plumb="plumb" :flowData="flowData" :select.sync="currentSelect"></flow-attr>
+      <el-scrollbar style="background: white">
+        <a-layout-sider
+          width="380"
+          theme="light"
+          class="attr-area"
+          @mousedown.stop="loseShortcut"
+        >
+          <flow-attr
+            :plumb="plumb"
+            :flowData="flowData"
+            :select.sync="currentSelect"
+          ></flow-attr>
         </a-layout-sider>
       </el-scrollbar>
     </a-layout>
@@ -158,7 +209,10 @@
       center
       :before-close="handleDialogClose"
     >
-      <el-input placeholder="输入关键字进行过滤" v-model="filterText"></el-input>
+      <el-input
+        placeholder="输入关键字进行过滤"
+        v-model="filterText"
+      ></el-input>
 
       <el-tree
         empty-text="暂无模板"
@@ -176,7 +230,9 @@
         <span class="custom-tree-node" slot-scope="{ node, data }">
           <span>{{ node.label }}</span>
           <span>
-            <el-button type="text" size="mini">{{data.createAuthor}}</el-button>
+            <el-button type="text" size="mini">{{
+              data.createAuthor
+            }}</el-button>
           </span>
         </span>
       </el-tree>
@@ -202,7 +258,7 @@
         >
           <el-form-item label="模板名" prop="templateName">
             <el-input
-              style="width:250px"
+              style="width: 250px"
               placeholder="请输入模板名"
               v-model="newTemObj.templateName"
               clearable
@@ -210,7 +266,7 @@
           </el-form-item>
           <el-form-item label="所属项目" prop="templateClassCode">
             <el-select
-              style="width:250px"
+              style="width: 250px"
               v-model="newTemObj.templateClassCode"
               filterable
               placeholder="请选择"
@@ -224,7 +280,12 @@
             </el-select>
           </el-form-item>
           <el-form-item label="body" prop="bodyId">
-            <el-select style="width:250px" v-model="newTemObj.bodyId" filterable placeholder="请选择">
+            <el-select
+              style="width: 250px"
+              v-model="newTemObj.bodyId"
+              filterable
+              placeholder="请选择"
+            >
               <el-option
                 v-for="item in bodys"
                 :key="item.bodyId"
@@ -1236,83 +1297,10 @@ export default {
     genXmlStr() {
       let that = this;
       let xmlJsonArray = JSON.parse(JSON.stringify(that.flowData.xmlJsonArray));
-      let resArray = [];
-      let foreachArray = [];
-      xmlJsonArray.map((data) => {
-        let obj = that.flowData.nodeList.find((node) => node.id === data.id);
-        let param = { id: data.id, name: data.name };
-        let forTag = {};
-        if (obj.isMulti) {
-          forTag.id = ZFSN.getId();
-          forTag.name = "foreach-" + forTag.id;
-          foreachArray.push({
-            id: forTag.name,
-            autoField: obj.autoField,
-            valExpression: obj.contentExpress,
-          });
-          if (data.pid) {
-            forTag.pid = data.pid;
-          }
-          param.pid = forTag.id;
-          resArray.push(forTag);
-        } else {
-          if (data.pid) {
-            param.pid = data.pid;
-          }
-        }
-
-        obj.attrs.forEach((v, i) => {
-          param[v.attributeName] = v.valExpress;
-        });
-        resArray.push(param);
-        return param;
-      });
-      let resultArray = this.transformTozTreeFormat(resArray);
-      let body = {};
-      resultArray.forEach((v, i) => {
-        let resMap = {};
-        that.makeResult(v, resMap);
-        body[resMap["_name"]] = resMap;
-        that.removeXmlNameAttr(resMap);
-      });
-      let result = this.$x2js.js2xml(body);
-      foreachArray.forEach((v, i) => {
-        let reg = new RegExp(`<${v.id}>`, "g");
-        let item = v.autoField.slice(0, v.autoField.length - 1);
-        let forVal = `<% for( ${item} in ${v.autoField} ){`;
-        let replaceStr = that.formatContent(v.valExpression, v.autoField);
-        result = result.replace(reg, forVal + "\n" + replaceStr + "%>");
-        result = result.replace(new RegExp(`</${v.id}>`), "<% } %>");
-      });
-      this.$set(
-        this.$store.getters.GET_CURRENT_TEMPLATE,
-        "odfXmlStr",
-        formatXml(result)
-      );
+      let result = that.transJsToXml(xmlJsonArray);
+      this.$set(this.$store.getters.GET_CURRENT_TEMPLATE, "odfXmlStr", result);
     },
 
-    formatContent(expression, autofield) {
-      let g = this;
-      let contentExpress = null;
-      let contentStr = "";
-      let field = autofield;
-      if (!g.isNullOrEmpty(expression)) {
-        try {
-          contentExpress = JSON.parse(expression);
-          let keys = Object.keys(contentExpress);
-          for (let i = 0; i < keys.length; i++) {
-            let key = keys[i];
-            let v = contentExpress[key];
-            v = v.replace(/\${each}/g, field.slice(0, field.length - 1));
-            contentStr += `\nvar ${key}=${v};`;
-          }
-        } catch (e) {
-          console.log("转换异常，原因是:" + e);
-          contentStr = expression;
-        }
-      }
-      return contentStr;
-    },
     /**
      * @description: 点击创建模板
      * @author: xiejr

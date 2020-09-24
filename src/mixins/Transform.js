@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-08-20 14:48:58
- * @LastEditTime: 2020-09-11 16:01:45
+ * @LastEditTime: 2020-09-24 17:46:30
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \odf-editor-ui\src\mixins\Transform.js
@@ -67,6 +67,128 @@ export default {
         })
       }
 
+    },
+    /**
+     * @description: 代码段由json转换为文本
+     * @author: xiejr
+     */
+    formatContent(expression, autofield) {
+      let g = this;
+      let contentExpress = null;
+      let contentStr = "";
+      let field = autofield;
+      if (!g.isNullOrEmpty(expression)) {
+        try {
+          contentExpress = JSON.parse(expression);
+          let keys = Object.keys(contentExpress);
+          for (let i = 0; i < keys.length; i++) {
+            let key = keys[i];
+            let v = contentExpress[key];
+            v = v.replace(/\${each}/g, field.slice(0, field.length - 1));
+            contentStr += `\nvar ${key}=${v};`;
+          }
+        } catch (e) {
+          console.log("转换异常，原因是:" + e);
+          contentStr = expression;
+        }
+      }
+      return contentStr;
+    },
+    /**
+     * @description: 由JS对象转换为xml 字符串
+     * @author: xiejr
+     */
+    transJsToXml(xmlJsonArray) {
+      let that = this;
+      let resArray = [];
+      let templateArray = [];
+      xmlJsonArray.map((data) => {
+        let obj = that.flowData.nodeList.find((node) => node.id === data.id);
+        let param = {
+          id: data.id,
+          name: data.name
+        };
+        let customTag = {};
+        if (!that.isNullOrEmpty(obj.contentExpress) || obj.isMulti) {
+          customTag.id = that.getId();
+          customTag.name = "template-" + customTag.id;
+          let val = "";
+          if (obj.isMulti) {
+            let item = obj.autoField.slice(0, obj.autoField.length - 1);
+            let forVal = `<% for( ${item} in ${obj.autoField} ){`;
+            let replaceStr = that.formatContent(obj.contentExpress, obj.autoField);
+            val = forVal + "\n" + replaceStr + "%>";
+          } else {
+            val = "<%" + that.formatContent(obj.contentExpress, obj.autoField) + "{%>";
+          }
+          templateArray.push({
+            id: customTag.name,
+            value: val
+          });
+          if (data.pid) {
+            customTag.pid = data.pid;
+          }
+          param.pid = customTag.id;
+          resArray.push(customTag);
+        } else {
+          if (data.pid) {
+            param.pid = data.pid;
+          }
+        }
+        obj.attrs.forEach((v, i) => {
+          param[v.attributeName] = v.valExpress;
+        });
+        resArray.push(param);
+        return param;
+      });
+      let body = JSON.parse(JSON.stringify(that.$store.getters.GET_BODY.find(body => body.node.id == that.$store.getters.GET_CURRENT_TEMPLATE.bodyId)));
+
+      let resultArray = this.transformTozTreeFormat(resArray);
+      let template = {};
+      let start = {};
+
+      //TODO odfbody
+      let odfBody = {
+
+      };
+      start[body.node.elementName] = odfBody;
+
+      body.attrs.forEach((v, i) => {
+        odfBody["_" + v.attributeName] = v.valExpress;
+      });
+      template.start = start;
+      resultArray.forEach((v, i) => {
+        let resMap = {};
+        that.makeResult(v, resMap);
+        odfBody[resMap["_name"]] = resMap;
+        that.removeXmlNameAttr(resMap);
+      });
+      let result = this.$x2js.js2xml(template);
+      result = that.resolvePlaceholders(result, templateArray);
+      let startStr = "<% DIRECTIVE SAFE_OUTPUT_OPEN;%>" + "\n";
+      startStr = startStr + "<% \n" + that.formatContent(body.node.contentExpress, body.node.autoField) + "\n %>";
+      result = result.replace(/<start>/, startStr);
+      result = result.replace(/<\/start>/, "<% \nDIRECTIVE SAFE_OUTPUT_CLOSE;\n%>")
+      result = result.replace(/&#x27;/g, "")
+      result = result.replace(/&quot;/g, "")
+      result = result.replace(/;/g, ";\n");
+      result = result.replace(/>/g, ">\n");
+
+      return result;
+    },
+
+    /**
+     * @description: 处理for标签和template标签占位符
+     * @author: xiejr
+     * @param result 初步解析后的xml
+     */
+    resolvePlaceholders(result, templateArray) {
+      templateArray.forEach((v, i) => {
+        let reg = new RegExp(`<${v.id}>`, "g");
+        result = result.replace(reg, v.value);
+        result = result.replace(new RegExp(`</${v.id}>`), "<% } %>");
+      });
+      return result;
     }
   }
 
