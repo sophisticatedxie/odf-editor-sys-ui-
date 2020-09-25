@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-07-27 11:16:24
- * @LastEditTime: 2020-09-22 16:09:14
+ * @LastEditTime: 2020-09-25 10:45:46
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \odf-editor-ui\src\util\rest.js
@@ -19,7 +19,7 @@ let rest = {
         }
         return JSON.stringify(data);
       },
-      baseURL: env === 'development' ?local.url : 'http://www.xiejr.com:8081/et_center/editor-api',
+      baseURL: env === 'development' ? local.url : 'http://www.xiejr.com:8081/et_center/editor-api',
       //5秒超时
       timeout: 500000000
 
@@ -40,13 +40,13 @@ let rest = {
           //不是200状态码的时候,需要格式化错误内容给用户
           switch (data.code) {
             case '500':
-              data.error = '服务器内部异常,具体信息是:' + data.error;
+              data.message = '服务器内部异常,具体信息是:' + data.error;
               break;
             case '403':
-              data.error = '你无权访问';
+              data.message = '你无权访问';
               break;
             default:
-              data.error = '请求失败,联系后台人员';
+              data.message = '请求失败,联系后台人员';
               break;
 
           }

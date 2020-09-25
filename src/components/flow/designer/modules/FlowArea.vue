@@ -1,20 +1,37 @@
 <template>
-  <div style="width: 100%; height: 100%; overflow: hidden; position: relative;">
+  <div style="width: 100%; height: 100%; overflow: hidden; position: relative">
     <div
-      v-if="container.auxiliaryLine.isOpen && container.auxiliaryLine.isShowXLine"
+      v-if="
+        container.auxiliaryLine.isOpen && container.auxiliaryLine.isShowXLine
+      "
       class="auxiliary-line-x"
       :style="{ top: auxiliaryLinePos.y + 'px' }"
     ></div>
     <div
-      v-if="container.auxiliaryLine.isOpen && container.auxiliaryLine.isShowYLine"
+      v-if="
+        container.auxiliaryLine.isOpen && container.auxiliaryLine.isShowYLine
+      "
       class="auxiliary-line-y"
       :style="{ left: auxiliaryLinePos.x + 'px' }"
     ></div>
     <div
       id="flowContainer"
       class="flow-container"
-      :class="{ grid: flowData.config.showGrid, zoomIn: currentTool.type == 'zoom-in', zoomOut: currentTool.type == 'zoom-out', canScale: container.scaleFlag, canDrag: container.dragFlag, canMultiple: rectangleMultiple.flag }"
-      :style="{ top: container.pos.top + 'px', left: container.pos.left + 'px', transform: 'scale(' + container.scale + ')', transformOrigin: container.scaleOrigin.x + 'px ' + container.scaleOrigin.y + 'px' }"
+      :class="{
+        grid: flowData.config.showGrid,
+        zoomIn: currentTool.type == 'zoom-in',
+        zoomOut: currentTool.type == 'zoom-out',
+        canScale: container.scaleFlag,
+        canDrag: container.dragFlag,
+        canMultiple: rectangleMultiple.flag,
+      }"
+      :style="{
+        top: container.pos.top + 'px',
+        left: container.pos.left + 'px',
+        transform: 'scale(' + container.scale + ')',
+        transformOrigin:
+          container.scaleOrigin.x + 'px ' + container.scaleOrigin.y + 'px',
+      }"
       @click.stop="containerHandler"
       @mousedown="mousedownHandler"
       @mousemove="mousemoveHandler"
@@ -40,11 +57,18 @@
       <div
         class="rectangle-multiple"
         v-if="rectangleMultiple.flag && rectangleMultiple.multipling"
-        :style="{ top: rectangleMultiple.position.top + 'px', left: rectangleMultiple.position.left + 'px', width: rectangleMultiple.width + 'px', height: rectangleMultiple.height + 'px' }"
+        :style="{
+          top: rectangleMultiple.position.top + 'px',
+          left: rectangleMultiple.position.left + 'px',
+          width: rectangleMultiple.width + 'px',
+          height: rectangleMultiple.height + 'px',
+        }"
       ></div>
     </div>
     <div class="container-scale">缩放倍数：{{ container.scaleShow }}%</div>
-    <div class="mouse-position">x: {{ mouse.position.x }}, y: {{ mouse.position.y }}</div>
+    <div class="mouse-position">
+      x: {{ mouse.position.x }}, y: {{ mouse.position.y }}
+    </div>
     <vue-context-menu
       :contextMenuData="containerContextMenuData"
       @flowInfo="flowInfo"
@@ -688,6 +712,9 @@ export default {
       let nodeList = that.flowData.nodeList;
       let linkList = that.flowData.linkList;
       let arr = [];
+      //feat  删除节点同时需要移除对应的xml数组
+      //1.删除该节点自身
+      let xmlJsonArray = that.flowData.xmlJsonArray || [];
 
       arr.push(Object.assign({}, that.currentSelect));
 
@@ -705,6 +732,17 @@ export default {
         that.plumb.deleteEveryEndpoint();
         let inx = nodeList.findIndex((node) => node.id == c.id);
         nodeList.splice(inx, 1);
+        //add 移除节点自身
+        xmlJsonArray.splice(
+          xmlJsonArray.findIndex((data) => data.id === c.id),
+          1
+        );
+        //删除它的所有子节点的pid
+        let sonsXmlArray = xmlJsonArray
+          .filter((data) => data.pid === c.id)
+          .forEach((v, i) => {
+            that.$delete(v, "pid");
+          });
         that.$nextTick(() => {
           linkList.forEach(function (link, index) {
             let conn = that.plumb.connect({

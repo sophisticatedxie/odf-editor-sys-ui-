@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-08-20 14:48:58
- * @LastEditTime: 2020-09-24 17:46:30
+ * @LastEditTime: 2020-09-25 14:56:20
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \odf-editor-ui\src\mixins\Transform.js
@@ -37,7 +37,10 @@ export default {
       }
       return node.children;
     },
-
+    /**
+     * @description: 自定义递归算法,实现将有层级结构的array转换成可转成xml的json对象
+     * @author: xiejr
+     */
     makeResult: function (source, map) {
       let that = this;
       let keys = Object.keys(source);
@@ -85,7 +88,7 @@ export default {
             let key = keys[i];
             let v = contentExpress[key];
             v = v.replace(/\${each}/g, field.slice(0, field.length - 1));
-            contentStr += `\nvar ${key}=${v};`;
+            contentStr += `var ${key}=${v};`;
           }
         } catch (e) {
           console.log("转换异常，原因是:" + e);
@@ -109,21 +112,50 @@ export default {
           name: data.name
         };
         let customTag = {};
+        let conditionFlag = obj.conditionFlag && !that.isNullOrEmpty(obj.condition);
+        debugger
+        //先判断条件表达式
+        if (conditionFlag) {
+          customTag.id = that.getId();
+          customTag.name = "if-" + customTag.id;
+          let condition = obj.condition;
+          if (!that.isNullOrEmpty(obj.autoField)) {
+            condition = condition.replace(/\${each}/g, obj.autoField.slice(0, obj.autoField.length - 1));
+          }
+          templateArray.push({
+            id: customTag.name,
+            startVal: `<% if(${condition}) { \n %>`,
+            endVal: '<% } %>'
+          })
+          if (data.pid) {
+            customTag.pid = data.pid;
+          }
+          data.pid = customTag.id;
+          resArray.push({
+            ...customTag
+          });
+          customTag = {};
+        }
         if (!that.isNullOrEmpty(obj.contentExpress) || obj.isMulti) {
           customTag.id = that.getId();
           customTag.name = "template-" + customTag.id;
           let val = "";
+          let startVal = "";
+          let endVal = "";
           if (obj.isMulti) {
             let item = obj.autoField.slice(0, obj.autoField.length - 1);
             let forVal = `<% for( ${item} in ${obj.autoField} ){`;
             let replaceStr = that.formatContent(obj.contentExpress, obj.autoField);
-            val = forVal + "\n" + replaceStr + "%>";
+            startVal = forVal + "\n" + replaceStr + "%>";
+            endVal = "<% } %>";
           } else {
-            val = "<%" + that.formatContent(obj.contentExpress, obj.autoField) + "{%>";
+            startVal = "<%" + that.formatContent(obj.contentExpress, obj.autoField) + "%>";
+            endVal = "<%  %>"
           }
           templateArray.push({
             id: customTag.name,
-            value: val
+            startVal: startVal,
+            endVal: endVal
           });
           if (data.pid) {
             customTag.pid = data.pid;
@@ -173,7 +205,6 @@ export default {
       result = result.replace(/&quot;/g, "")
       result = result.replace(/;/g, ";\n");
       result = result.replace(/>/g, ">\n");
-
       return result;
     },
 
@@ -185,8 +216,8 @@ export default {
     resolvePlaceholders(result, templateArray) {
       templateArray.forEach((v, i) => {
         let reg = new RegExp(`<${v.id}>`, "g");
-        result = result.replace(reg, v.value);
-        result = result.replace(new RegExp(`</${v.id}>`), "<% } %>");
+        result = result.replace(reg, v.startVal);
+        result = result.replace(new RegExp(`</${v.id}>`), v.endVal);
       });
       return result;
     }

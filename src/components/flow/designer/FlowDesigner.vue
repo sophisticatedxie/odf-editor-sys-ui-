@@ -1,7 +1,7 @@
 <!--
  * @Author:xiejr
  * @Date: 2020-07-24 11:52:25
- * @LastEditTime: 2020-09-24 17:34:54
+ * @LastEditTime: 2020-09-25 15:19:34
  * @LastEditors: Please set LastEditors
  * @Description: 编辑器主页
  * @FilePath: \odf-editor-ui\src\components\flow\designer\FlowDesigner.vue
@@ -735,9 +735,6 @@ export default {
           (data) => data.id == conn.sourceId
         );
         let sourceMap = { id: sourceObj.id, name: sourceObj.nodeName };
-        // sourceObj.attrs.forEach((v, i) => {
-        //   sourceMap[v.attributeName] = v.valExpress;
-        // });
         let targetObj = that.flowData.nodeList.find(
           (data) => data.id == conn.targetId
         );
@@ -746,9 +743,6 @@ export default {
           name: targetObj.nodeName,
           pid: sourceMap.id,
         };
-        // targetObj.attrs.forEach((v, i) => {
-        //   targetMap[v.attributeName] = v.valExpress;
-        // });
         let xmlJsonArray = that.flowData.xmlJsonArray || [];
         if (
           that.isNullOrEmpty(
@@ -1460,6 +1454,8 @@ export default {
             isClosure: d.node.isClosure == "0",
             contentExpress: d.node.contentExpress,
             attrs: d.attrs,
+            condition: d.condition || "",
+            conditionFlag: d.enableCondition == 1,
           };
         });
 

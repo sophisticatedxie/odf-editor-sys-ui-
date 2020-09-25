@@ -2,23 +2,26 @@
   <div>
     <a-tabs size="small" defaultActiveKey="flow-attr" :activeKey="activeKey">
       <a-tab-pane key="flow-attr">
-        <span slot="tab">
-          <a-icon type="cluster" />模板属性
-        </span>
+        <span slot="tab"> <a-icon type="cluster" />模板属性 </span>
         <a-form layout="horizontal">
           <a-form-item
             label="模板id"
             :label-col="formItemLayout.labelCol"
             :wrapper-col="formItemLayout.wrapperCol"
           >
-            <a-input :value="$store.getters.GET_CURRENT_TEMPLATE.templateId" disabled />
+            <a-input
+              :value="$store.getters.GET_CURRENT_TEMPLATE.templateId"
+              disabled
+            />
           </a-form-item>
           <a-form-item
             label="模板名"
             :label-col="formItemLayout.labelCol"
             :wrapper-col="formItemLayout.wrapperCol"
           >
-            <a-input v-model="$store.getters.GET_CURRENT_TEMPLATE.templateName" />
+            <a-input
+              v-model="$store.getters.GET_CURRENT_TEMPLATE.templateName"
+            />
           </a-form-item>
           <a-form-item
             label="接口地址"
@@ -30,9 +33,7 @@
         </a-form>
       </a-tab-pane>
       <a-tab-pane key="node-attr">
-        <span slot="tab">
-          <a-icon type="profile" />节点属性
-        </span>
+        <span slot="tab"> <a-icon type="profile" />节点属性 </span>
         <template>
           <a-form layout="horizontal">
             <a-form-item
@@ -85,6 +86,29 @@
               />
             </a-form-item>
             <a-form-item
+              label="开启条件"
+              :label-col="formItemLayout.labelCol"
+              :wrapper-col="formItemLayout.wrapperCol"
+            >
+              <a-switch
+                checked-children="是"
+                un-checked-children="否"
+                default-checked
+                v-model="currentSelect.conditionFlag"
+              />
+            </a-form-item>
+            <a-form-item
+              label="条件表达式"
+              :label-col="formItemLayout.labelCol"
+              :wrapper-col="formItemLayout.wrapperCol"
+            >
+              <a-input
+                placeholder="请输入自动域值(仅多节点和body时使用)"
+                v-model="currentSelect.condition"
+                @change="checkField"
+              />
+            </a-form-item>
+            <a-form-item
               label="节点代码块"
               :label-col="formItemLayout.labelCol"
               :wrapper-col="formItemLayout.wrapperCol"
@@ -101,9 +125,11 @@
               :label-col="formItemLayout.labelCol"
               :wrapper-col="formItemLayout.wrapperCol"
             >
-              <el-button @click="addNewAttr" size="small" type="success">添加属性</el-button>
+              <el-button @click="addNewAttr" size="small" type="success"
+                >添加属性</el-button
+              >
             </a-form-item>
-            <template v-for="(attr,index) in currentSelect.attrs">
+            <template v-for="(attr, index) in currentSelect.attrs">
               <a-form-item
                 :key="attr.id"
                 :label="attr.attributeName"
@@ -111,24 +137,24 @@
                 :wrapper-col="formItemLayout.wrapperCol"
               >
                 <el-input
-                  style="width:150px"
+                  style="width: 150px"
                   size="mini"
                   v-model="attr.valExpress"
                   placeholder="请输入属性占位符"
                 ></el-input>
                 <el-button
-                  style="margin-left:15px"
+                  style="margin-left: 15px"
                   type="primary"
                   icon="el-icon-edit"
                   size="small"
-                  @click="editAttr(attr,index)"
+                  @click="editAttr(attr, index)"
                   circle
                 ></el-button>
                 <el-button
-                  style="margin-left:15px"
+                  style="margin-left: 15px"
                   type="danger"
                   size="small"
-                  @click="removeAttr(attr,index)"
+                  @click="removeAttr(attr, index)"
                   icon="el-icon-delete"
                   circle
                 ></el-button>
@@ -138,9 +164,7 @@
         </template>
       </a-tab-pane>
       <a-tab-pane key="link-attr">
-        <span slot="tab">
-          <a-icon type="branches" />连线属性
-        </span>
+        <span slot="tab"> <a-icon type="branches" />连线属性 </span>
         <a-form layout="horizontal">
           <a-form-item
             label="id"
@@ -197,7 +221,7 @@
       </el-form>
       <template slot="footer">
         <el-button type="primary" @click="saveNewAttr">保存</el-button>
-        <el-button @click="dialogVisible=false">取消</el-button>
+        <el-button @click="dialogVisible = false">取消</el-button>
       </template>
     </el-dialog>
   </div>
