@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-08-18 16:31:20
- * @LastEditTime: 2020-09-14 18:01:31
+ * @LastEditTime: 2020-09-27 16:45:19
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \editor-ui\odf-editor-ui\src\components\flow\designer\modules\XmlViewer.vue
@@ -11,14 +11,19 @@
     :before-close="handleDialogClose"
     destroy-on-close
     width="90%"
-    title="xml视图"
+    :title="title"
     :visible.sync="xmlShow"
     center
   >
-    <codemirror ref="myCm" v-model="xml" :options="cmOptions" class="code"></codemirror>
+    <codemirror
+      ref="myCm"
+      v-model="xml"
+      :options="cmOptions"
+      class="code"
+    ></codemirror>
     <template slot="footer">
-      <el-button @click="genResult">生成报文</el-button>
-      <el-button @click="cancel">取消</el-button>
+      <el-button @click="lbtFunc">{{ lbtTitle }}</el-button>
+      <el-button @click="rbtFunc">{{ rbtTitle }}</el-button>
     </template>
   </el-dialog>
 </template>
@@ -37,6 +42,21 @@ export default {
     codemirror,
   },
   props: {
+    lbtTitle: {
+      type: String,
+      required: false,
+      default: "左按钮",
+    },
+    rbtTitle: {
+      type: String,
+      required: false,
+      default: "右按钮",
+    },
+    title: {
+      type: String,
+      required: false,
+      default: "xml视图",
+    },
     code: {
       type: String,
       required: false,
@@ -44,6 +64,14 @@ export default {
     },
     xmlDialog: {
       type: Boolean,
+      required: true,
+    },
+    lbtFunc: {
+      type: Function,
+      required: true,
+    },
+    rbtFunc: {
+      type: Function,
       required: true,
     },
   },
@@ -78,19 +106,13 @@ export default {
       xmlShow: this.xmlDialog,
     };
   },
-  mounted() {},
   methods: {
-    genResult() {
-      return this.$emit("genResult");
-    },
-    cancel() {
+    handleDialogClose() {
       this.xmlShow = false;
       return this.$emit("update:xmlDialog", this.xmlShow);
     },
-    handleDialogClose() {
-      this.cancel();
-    },
   },
+  mounted() {},
 };
 </script>
 <style scoped>

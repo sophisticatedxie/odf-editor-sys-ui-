@@ -1,7 +1,7 @@
 <!--
  * @Author:xiejr
  * @Date: 2020-07-24 11:52:25
- * @LastEditTime: 2020-09-25 15:19:34
+ * @LastEditTime: 2020-09-27 17:01:34
  * @LastEditors: Please set LastEditors
  * @Description: 编辑器主页
  * @FilePath: \odf-editor-ui\src\components\flow\designer\FlowDesigner.vue
@@ -306,9 +306,23 @@
     <test-modal ref="testModal" @loadFlow="loadFlow"></test-modal>
     <xml-viewer
       v-if="xmlDialog"
+      title="xml模板"
+      lbtTitle="生成xml"
+      rbtTitle="取消"
+      :lbtFunc="genResult"
+      :rbtFunc="closeXmlDialog"
       :xmlDialog.sync="xmlDialog"
-      @genResult="genResult"
       v-model="$store.getters.GET_CURRENT_TEMPLATE.odfXmlStr"
+    ></xml-viewer>
+    <xml-viewer
+      v-if="xmlResultDialog"
+      title="转化结果"
+      lbtTitle="导出文本"
+      rbtTitle="取消"
+      :lbtFunc="() => {}"
+      :rbtFunc="() => {}"
+      :xmlDialog.sync="xmlResultDialog"
+      v-model="$store.getters.GET_CURRENT_TEMPLATE.odfResult"
     ></xml-viewer>
   </div>
 </template>
@@ -530,39 +544,40 @@ export default {
      * @author: xiejr
      */
     genResult() {
+      debugger;
       let that = this;
       let template = this.$store.getters.GET_CURRENT_TEMPLATE;
-      that.judgeTemplateModified(
-        (action, instance) => {
-          if (action == "confirm") {
-            that.xmlDialog = false;
-            that.$nextTick(() => {
-              that.saveFlow(false).then((res) => {
-                that.xmlDialog = false;
-                that.$nextTick(() => {
-                  restful
-                    .genOdfResult(that, template.templateId)
-                    .then((resp) => {
-                      that.$set(template, "modified", false);
-                      that.$set(
-                        that.$store.getters.GET_CURRENT_TEMPLATE,
-                        "odfResult",
-                        resp
-                      );
-                      that.$nextTick(() => {
-                        that.xmlResultDialog = true;
-                      });
-                    })
-                    .catch((err) => {
-                      that.$set(template, "modified", true);
-                    });
-                });
+      let genFunc = () => {
+        that.xmlDialog = false;
+        that.$nextTick(() => {
+          restful
+            .genOdfResult(that, template.templateId)
+            .then((resp) => {
+              that.$set(template, "modified", false);
+              that.$set(
+                that.$store.getters.GET_CURRENT_TEMPLATE,
+                "odfResult",
+                resp
+              );
+              that.$nextTick(() => {
+                that.xmlResultDialog = true;
               });
+            })
+            .catch((err) => {
+              that.$set(template, "modified", true);
             });
-          }
-        },
-        () => {}
-      );
+        });
+      };
+      that.judgeTemplateModified((action, instance) => {
+        if (action == "confirm") {
+          that.xmlDialog = false;
+          that.$nextTick(() => {
+            that.saveFlow(that.$refs.flowArea.getContainer()).then((res) => {
+              genFunc();
+            });
+          });
+        }
+      }, genFunc);
     },
     downLoadResult() {},
 
@@ -914,6 +929,9 @@ export default {
         that.flowData.config = loadData.config;
         that.flowData.status = flowConfig.flowStatus.LOADING;
         that.flowData.xmlJsonArray = loadData.xmlJsonArray;
+        if (that.isNullOrEmpty(loadData.container)) {
+          that.$refs.flowArea.setContainer(loadData.container);
+        }
         that.plumb.batch(function () {
           let nodeList = loadData.nodeList;
           nodeList.forEach(function (node, index) {
@@ -1051,14 +1069,17 @@ export default {
       return true;
     },
     async save() {
-      let result = await this.saveFlow();
+      let result = await this.saveFlow(this.$refs.flowArea.getContainer());
       if (result) {
         this.$message.success("保存成功");
       }
     },
-    async saveFlow() {
+    async saveFlow(container) {
       const that = this;
       let flowObj = Object.assign({}, that.flowData);
+      if (!that.isNullOrEmpty(container)) {
+        flowObj.container = JSON.parse(JSON.stringify(container));
+      }
       if (!that.checkFlow()) return;
       flowObj.status = flowConfig.flowStatus.SAVE;
       let d = JSON.stringify(flowObj);
@@ -1305,7 +1326,7 @@ export default {
       that.judgeTemplateModified(
         (action, instance) => {
           if (action == "confirm") {
-            that.saveFlow().then((res) => {
+            that.saveFlow(that.$refs.flowArea.getContainer()).then((res) => {
               that.clear();
               that.$nextTick(() => {
                 this.$store.commit("SET_NEW_TEMPLATE_DIALOG_VISIBLE", true);
@@ -1379,6 +1400,13 @@ export default {
           return false;
         }
       });
+    },
+    /**
+     * @description: 关闭xml视图对话框
+     * @author: xiejr
+     */
+    closeXmlDialog() {
+      this.xmlDialog = false;
     },
   },
   computed: {

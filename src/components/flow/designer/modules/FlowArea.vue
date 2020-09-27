@@ -174,6 +174,15 @@ export default {
     };
   },
   methods: {
+    setContainer(container){
+      let that=this;
+      if(!that.isNullOrEmpty(container)){
+        that.container=container;
+      }
+    },
+    getContainer(){
+      return this.container;
+    },
     initFlowArea() {
       const that = this;
       that.ctx = document.getElementById("flowContainer").parentNode;
@@ -353,35 +362,35 @@ export default {
      * 放大画布
      */
     enlargeContainer() {
-      const that = this;
-      that.container.scaleOrigin.x = that.mouse.position.x;
-      that.container.scaleOrigin.y = that.mouse.position.y;
-      let newScale = ZFSN.add(
-        that.container.scale,
-        flowConfig.defaultStyle.containerScale.onceEnlarge
-      );
-      if (newScale <= flowConfig.defaultStyle.containerScale.max) {
-        that.container.scale = newScale;
-        that.container.scaleShow = ZFSN.mul(that.container.scale, 100);
-        that.plumb.setZoom(that.container.scale);
-      }
+      // const that = this;
+      // that.container.scaleOrigin.x = that.mouse.position.x;
+      // that.container.scaleOrigin.y = that.mouse.position.y;
+      // let newScale = ZFSN.add(
+      //   that.container.scale,
+      //   flowConfig.defaultStyle.containerScale.onceEnlarge
+      // );
+      // if (newScale <= flowConfig.defaultStyle.containerScale.max) {
+      //   that.container.scale = newScale;
+      //   that.container.scaleShow = ZFSN.mul(that.container.scale, 100);
+      //   that.plumb.setZoom(that.container.scale);
+      // }
     },
     /**
      * 缩小画布
      */
     narrowContainer() {
-      const that = this;
-      that.container.scaleOrigin.x = that.mouse.position.x;
-      that.container.scaleOrigin.y = that.mouse.position.y;
-      let newScale = ZFSN.sub(
-        that.container.scale,
-        flowConfig.defaultStyle.containerScale.onceNarrow
-      );
-      if (newScale >= flowConfig.defaultStyle.containerScale.min) {
-        that.container.scale = newScale;
-        that.container.scaleShow = ZFSN.mul(that.container.scale, 100);
-        that.plumb.setZoom(that.container.scale);
-      }
+      // const that = this;
+      // that.container.scaleOrigin.x = that.mouse.position.x;
+      // that.container.scaleOrigin.y = that.mouse.position.y;
+      // let newScale = ZFSN.sub(
+      //   that.container.scale,
+      //   flowConfig.defaultStyle.containerScale.onceNarrow
+      // );
+      // if (newScale >= flowConfig.defaultStyle.containerScale.min) {
+      //   that.container.scale = newScale;
+      //   that.container.scaleShow = ZFSN.mul(that.container.scale, 100);
+      //   that.plumb.setZoom(that.container.scale);
+      // }
     },
     /**
      * 展示画布菜单(右键)
@@ -456,7 +465,7 @@ export default {
      * 保存当前模板
      */
     saveFlow() {
-      this.$emit("saveFlow");
+      this.$emit("saveFlow", this.container);
     },
     /**
      * 设置组件对齐方式

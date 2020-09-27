@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-08-20 14:48:58
- * @LastEditTime: 2020-09-25 14:56:20
+ * @LastEditTime: 2020-09-27 16:24:56
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \odf-editor-ui\src\mixins\Transform.js
@@ -113,7 +113,6 @@ export default {
         };
         let customTag = {};
         let conditionFlag = obj.conditionFlag && !that.isNullOrEmpty(obj.condition);
-        debugger
         //先判断条件表达式
         if (conditionFlag) {
           customTag.id = that.getId();
@@ -201,8 +200,8 @@ export default {
       startStr = startStr + "<% \n" + that.formatContent(body.node.contentExpress, body.node.autoField) + "\n %>";
       result = result.replace(/<start>/, startStr);
       result = result.replace(/<\/start>/, "<% \nDIRECTIVE SAFE_OUTPUT_CLOSE;\n%>")
-      result = result.replace(/&#x27;/g, "")
-      result = result.replace(/&quot;/g, "")
+      result = result.replace(/&#x27;/g, "'")
+      result = result.replace(/&quot;/g, "\"")
       result = result.replace(/;/g, ";\n");
       result = result.replace(/>/g, ">\n");
       return result;
