@@ -14,10 +14,8 @@ compile:
     image: docker.io/node 
     stage: compile
     script:
-        - npm install -g cnpm --registry=https://registry.npm.taobao.org
-        - npm rebuild node-sass
-        - rm -rf node_modules/
-        - cnpm install
+        #- npm install -g cnpm --registry=https://registry.npm.taobao.org
+        - npm install
         - npm run build 
     only:
         - master
