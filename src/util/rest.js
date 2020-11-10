@@ -26,7 +26,7 @@ let rest = {
     });
     //请求前置拦截
     request.interceptors.request.use((config) => {
-      let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MDQwMjY0ODcsInVzZXJJZCI6InhpYW94aWUifQ.pgX4pVVHAFxq9uyCrEd3ephVRMdysGcqqfdkwfJEPn0";
+      let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ4aWFveGllIn0.5VbRo_V4bJyM66N-EVFpcJfX-xqqmzVV5dB_YRvZZ24";
       config.headers['token'] = token;
       config.headers['operator'] = 'admin';
       return config;
